@@ -1,0 +1,24 @@
+
+.sf-trial-entry{background:#eeeafd;border:1px solid #cbbffb;border-radius:9px;color:#6049c3;font-size:11px;font-weight:800;padding:9px;cursor:pointer;white-space:nowrap}
+#sfTrialDialog{max-width:460px;width:calc(100% - 24px);max-height:92dvh;overflow:auto;padding:19px;border-radius:17px;border:1px solid #dedbeb;background:#fff;color:#303046;box-shadow:0 16px 55px #17142655}
+#sfTrialDialog::backdrop{background:#17142688}
+.sf-auth-head{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:18px}
+.sf-auth-head button{border:0;border-radius:7px;background:#efeff6;padding:6px 9px;cursor:pointer}
+.sf-auth-hint,.sf-auth-footer{color:#606078;font-size:12px;line-height:1.65}
+.sf-auth-form{display:grid;gap:10px;margin:13px 0}
+.sf-auth-form[hidden],.sf-student-account[hidden]{display:none!important}
+.sf-auth-form label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700}
+.sf-auth-form input{border:1px solid #dad8eb;border-radius:8px;font:inherit;padding:12px;width:100%;box-sizing:border-box}
+.sf-auth-form input:focus{outline:2px solid #b6a8fa}
+.sf-auth-form button,.sf-student-account button{padding:12px 9px;border:0;border-radius:9px;background:#7059e5;color:white;font-weight:800;cursor:pointer}
+.sf-auth-form button:disabled{opacity:.6}
+.sf-auth-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sf-auth-row button:first-child{background:#e9e4ff;color:#5543ac}
+.sf-auth-divider{margin:14px 0 5px;border-top:1px solid #e5e3f0;padding-top:12px;font-size:12px;color:#7b7596;font-weight:700}
+.sf-trial-status{min-height:22px;color:#287c69;font-size:12px;font-weight:700;line-height:1.55}
+.sf-trial-status[data-bad="1"]{color:#b83737}
+.sf-student-account{display:grid;gap:7px;background:#f5f3ff;border:1px solid #e2ddfd;padding:14px;border-radius:12px;font-size:13px}
+.sf-student-account small{font-size:11px;color:#625c77;line-height:1.5}
+.sf-student-account button{margin-top:7px;background:#5543ac}
+@media(max-width:820px){.sf-trial-entry{font-size:10px;padding:7px}.top-actions{gap:5px}}
+@media(max-width:400px){.sf-trial-entry{font-size:9px;padding:6px}.sf-auth-row{grid-template-columns:1fr 1fr}}
