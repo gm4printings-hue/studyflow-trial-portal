@@ -1,0 +1,75 @@
+/* Student theme controls: local-only visual preference, not authentication. */
+html[data-study-theme=calm]{
+ --primary:#268897;--primary-dark:#146a75;--lavender:#e2f5f5;--lavender-text:#176f79;--ink:#203842;--muted:#667d85;--border:#dae7e8;--panel:#fff;--bg:#f4f9f9;--success:#258a70;
+}
+html[data-study-theme=joy]{
+ --primary:#9460da;--primary-dark:#7541b8;--lavender:#f4e7fe;--lavender-text:#7a42c7;--ink:#3e3254;--muted:#81758c;--border:#efddf7;--panel:#fff;--bg:#fff7fd;--success:#258a70;
+}
+html[data-study-theme=night]{
+ --primary:#baa2ff;--primary-dark:#d4c3ff;--lavender:#35405d;--lavender-text:#d4bfff;--ink:#f5f6fe;--muted:#b8c2d4;--border:#3b4760;--panel:#202b41;--bg:#111b2c;--success:#75d0af;--shadow:0 6px 24px rgba(0,0,0,.12);color-scheme:dark;
+}
+html[data-study-theme=night] body,
+html[data-study-theme=night] .body-area{background:var(--bg);color:var(--ink)}
+html[data-study-theme=night] .sidebar,
+html[data-study-theme=night] .topbar,
+html[data-study-theme=night] .metric,
+html[data-study-theme=night] .panel,
+html[data-study-theme=night] .subject-card,
+html[data-study-theme=night] .timeline-date,
+html[data-study-theme=night] .timeline-box,
+html[data-study-theme=night] .plan-card,
+html[data-study-theme=night] .mobile-bottom,
+html[data-study-theme=night] .modal-head,
+html[data-study-theme=night] .card-study,
+html[data-study-theme=night] .answer,
+html[data-study-theme=night] #modal{background:var(--panel);color:var(--ink);border-color:var(--border)}
+html[data-study-theme=night] .topbar .crumb b,
+html[data-study-theme=night] .metric-value,
+html[data-study-theme=night] .subject-card h3,
+html[data-study-theme=night] .card-study .card-text,
+html[data-study-theme=night] .empty strong{color:var(--ink)}
+html[data-study-theme=night] .intro,
+html[data-study-theme=night] .metric-label,
+html[data-study-theme=night] .metric-sub,
+html[data-study-theme=night] .subject-card p,
+html[data-study-theme=night] .subject-foot small,
+html[data-study-theme=night] .helper,
+html[data-study-theme=night] .footer-note,
+html[data-study-theme=night] .account small,
+html[data-study-theme=night] .side-label,
+html[data-study-theme=night] .timeline-day,
+html[data-study-theme=night] .task-body small,
+html[data-study-theme=night] .topbar .crumb,
+html[data-study-theme=night] .nav-link{color:var(--muted)}
+html[data-study-theme=night] input,
+html[data-study-theme=night] textarea,
+html[data-study-theme=night] select{background:#172136!important;color:var(--ink)!important;border-color:var(--border)!important}
+html[data-study-theme=night] .study-tip,
+html[data-study-theme=night] .callout,
+html[data-study-theme=night] .empty,
+html[data-study-theme=night] .top-plan,
+html[data-study-theme=night] .btn.ghost,
+html[data-study-theme=night] .subject-foot button{background:#2a3853!important;color:var(--ink)!important;border-color:var(--border)!important}
+html[data-study-theme=night] .task-row{border-color:var(--border)}
+html[data-study-theme=night] .local-badge{color:#8bdcbb;background:#244b48}
+html[data-study-theme=night] .hero{background:linear-gradient(120deg,#2b3461,#493b7a)}
+html[data-study-theme=calm] .hero{background:linear-gradient(120deg,#177b87,#68b6bb)}
+html[data-study-theme=joy] .hero{background:linear-gradient(120deg,#8c54cc,#e3a2db)}
+html[data-study-theme=calm] .brand-mark{background:linear-gradient(145deg,#54b7bb,#1c7c87)}
+html[data-study-theme=joy] .brand-mark{background:linear-gradient(145deg,#ed9dd9,#8957cd)}
+html[data-study-theme=night] .brand-mark{background:linear-gradient(145deg,#715fb7,#4b477d)}
+.studyflow-appearance-trigger{font-size:11px;font-weight:750;padding:9px 11px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--ink);white-space:nowrap}
+.studyflow-appearance-trigger:hover{border-color:var(--primary)}
+.studyflow-theme-dialog{border:1px solid var(--border);border-radius:18px;max-width:610px;width:calc(100vw - 24px);padding:0;background:var(--panel);color:var(--ink);box-shadow:0 18px 65px #10173555}
+.studyflow-theme-dialog::backdrop{background:#0d1524a8}
+.studyflow-theme-modal{padding:23px}.studyflow-theme-modal p{font-size:13px;color:var(--muted)}
+.studyflow-theme-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.studyflow-theme-head h2{font-size:20px}.studyflow-theme-head button{background:transparent;border:0;font-size:25px;color:var(--ink)}
+.studyflow-theme-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:18px 0}
+.studyflow-theme-options button{display:flex;flex-direction:column;gap:7px;align-items:flex-start;border:2px solid var(--border);border-radius:13px;background:var(--panel);color:var(--ink);padding:10px;text-align:left;min-width:0}
+.studyflow-theme-options button[aria-pressed=true]{border-color:var(--primary)}
+.studyflow-theme-options strong{font-size:14px}.studyflow-theme-options small{font-size:11px;color:var(--muted)}
+.studyflow-theme-swatch{width:100%;border-radius:8px;min-height:66px;display:grid;place-items:center;font-size:25px;font-weight:760}
+.swatch-calm{background:#e7f6f6;color:#247887}.swatch-joy{background:#f8dff1;color:#8659c8}.swatch-night{background:#28324c;color:#c3b2ff}
+.studyflow-theme-foot{font-size:11px;color:var(--muted)}
+@media(max-width:550px){.studyflow-appearance-trigger{font-size:10px;padding:8px}.studyflow-theme-options{grid-template-columns:1fr}.studyflow-theme-options button{display:grid;grid-template-columns:75px 1fr;align-items:center}.studyflow-theme-swatch{grid-row:span 2;min-height:48px}}

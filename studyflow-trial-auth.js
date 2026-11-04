@@ -15,7 +15,7 @@ try { const u=new URL(location.href); let changed=false;
 let studentProfile=null;
 const welcome=document.createElement("section");
 welcome.id="sfWelcome";welcome.hidden=true;welcome.setAttribute("aria-label","Student home");
-welcome.innerHTML='<h2 id="sfWelcomeTitle"></h2><p id="sfWelcomeMeta"></p><a class="sf-start-studying" href="https://curious-gaufre-4decce.netlify.app/" rel="noopener">Start studying</a><p class="sf-welcome-note">Opens the current learning demo. Lessons are saved in that browser, not yet synced to your account.</p>';
+welcome.innerHTML='<h2 id="sfWelcomeTitle"></h2><p id="sfWelcomeMeta"></p><a class="sf-start-studying" href="./study.html">Start studying</a><p class="sf-welcome-note">Opens your private student workspace. Learning progress is saved under your StudyFlow account.</p>';
 document.querySelector(".top-actions")?.insertAdjacentElement("afterend",welcome);
 const welcomeStyle=document.createElement("style");
 welcomeStyle.textContent='#sfWelcome{background:#f3efff;border:1px solid #ded5fc;padding:18px;margin:16px 0;border-radius:14px;color:#342d58}#sfWelcome[hidden]{display:none}#sfWelcomeTitle{margin:0 0 6px;font-size:22px;color:#583dbb}#sfWelcomeMeta{margin:3px 0 16px}#sfWelcome .sf-start-studying{display:block;background:#6750d7;padding:13px 14px;color:white;text-align:center;text-decoration:none;border-radius:10px;font-weight:800}#sfWelcome .sf-welcome-note{font-size:11px;line-height:1.55;margin:12px 0 0;color:#6e6783}';

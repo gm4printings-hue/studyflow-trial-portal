@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#7356f5"><meta name="description" content="Smart Study Companion: local-first study planner, flashcards and quizzes">
+<title>StudyFlow — Smart Study Companion</title><link rel="stylesheet" href="./study-style.css"><link rel="stylesheet" href="./study-plus.css"><link rel="stylesheet" href="./study-mobile-nav.css"><link rel="stylesheet" href="./study-themes.css"><link rel="stylesheet" href="./study-balance.css"><link rel="stylesheet" href="./studyflow-trial-auth.css"><style>.sf-study-gate{max-width:680px;margin:15vh auto;padding:22px;border:1px solid #ded5fc;border-radius:15px;background:white;box-shadow:0 10px 30px #23175720;text-align:center;font:600 16px system-ui;color:#54409e}.sf-study-gate a{color:#6144cf}.sf-private-signout{border:1px solid #d7ceef;border-radius:8px;background:#fff;padding:7px;color:#5c45bc;font-weight:700;cursor:pointer}#sfPrivateApp[hidden]{display:none!important}</style></head>
+<body><div id="sfStudyGate" class="sf-study-gate" role="status">Checking your StudyFlow student loginâ€¦</div>
+<div class="app" id="sfPrivateApp" hidden>
+ <aside class="sidebar" id="sidebar" aria-label="Navigation">
+  <div class="brand"><div class="brand-mark">✦</div><div><strong>studyflow<span class="brand-dot">.</span></strong><small>YOUR STUDY COMPANION</small></div></div>
+  <div class="side-label">WORKSPACE</div>
+  <nav class="nav" aria-label="Main">
+   <button data-view="dashboard" class="nav-link selected"><span>◫</span> Overview</button>
+   <button data-view="subjects" class="nav-link"><span>▤</span> My subjects</button>
+   <button data-view="planner" class="nav-link"><span>▦</span> Study planner</button>
+   <button data-view="flashcards" class="nav-link"><span>▣</span> Flashcards</button>
+   <button data-view="quiz" class="nav-link"><span>◎</span> Practice quiz</button>
+  </nav>
+  <div class="side-label side-label-lower">YOUR ACCOUNT</div>
+  <nav class="nav"><button data-view="settings" class="nav-link"><span>⚙</span> Settings & plans</button></nav>
+  <div class="sidebar-bottom">
+   <div class="study-tip"><div class="tiny-icon">✷</div><b>Small steps, big progress.</b><span>One focused session at a time. You've got this.</span></div>
+   <div class="account"><div class="avatar">S</div><div><b id="sfPrivateStudentName">Student</b><small id="sfPrivateStudentClass">Personal workspace</small></div><span class="online-dot"></span></div>
+  </div>
+ </aside>
+ <div class="body-area">
+  <header class="topbar"><button class="mobile-menu" id="menuToggle" aria-label="Open menu">☰</button>
+   <div class="crumb"><span>My workspace</span><span class="crumb-slash">/</span><b id="crumbTitle">Overview</b></div>
+   <div class="top-actions"><span class="local-badge">● Local & private</span><button class="top-plan" data-view="settings" id="topPlan">Free plan · 10 credits</button><button type="button" id="sfPrivateSignout" class="sf-private-signout">Sign out</button></div>
+  </header>
+  <main id="main" class="content" tabindex="-1"></main>
+  <div class="mobile-bottom" aria-label="Quick navigation"><button data-view="dashboard">⌂<small>Home</small></button><button data-view="planner">▦<small>Plan</small></button><button data-view="flashcards">▣<small>Cards</small></button><button data-view="quiz">◎<small>Quiz</small></button></div>
+ </div>
+</div>
+<dialog id="modal" aria-label="Edit study workspace"><div id="modalBody"></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script type="module" src="./study-gate.js"></script></body></html>

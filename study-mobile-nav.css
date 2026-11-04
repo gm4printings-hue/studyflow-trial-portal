@@ -1,0 +1,31 @@
+
+.studyflow-mobile-tools{display:none}
+@media(max-width:820px){
+ .mobile-bottom{display:none!important}
+ /* Mobile has one navigation system: the nine-tool launcher. The desktop sidebar
+    remains in the DOM for existing routing, but is not visually interactive. */
+ .sidebar{display:none!important}
+ #menuToggle{display:none!important}
+ .body-area{width:100%;min-width:0}
+ .studyflow-mobile-tools{display:block;position:sticky;top:0;z-index:25;padding:10px 12px 12px;background:rgba(255,255,255,.99);border-bottom:1px solid #e8e4f4;box-shadow:0 4px 14px rgba(59,44,107,.075);width:100%;box-sizing:border-box}
+ .studyflow-tools-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#51448a;min-height:27px;padding:0 3px 5px}
+ .studyflow-tools-heading b{font-size:12px;font-weight:800}
+ #studyflow-tools-toggle{border:1px solid #dfd8fa;background:#f4f0ff;color:#6551d5;border-radius:8px;padding:6px 10px;font-weight:750;font-size:11px;cursor:pointer}
+ .studyflow-tools-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:5px}
+ .studyflow-tool-item{min-width:0;padding:6px 2px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:61px;border:1px solid #eeecf8;background:#fcfbff;border-radius:10px;color:#4b4c62;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+ .studyflow-tool-item:active{background:#e8e1ff}
+ .studyflow-tool-item.is-current{border-color:#9e89f9;background:#f2edff;color:#6345d4}
+ .studyflow-tool-icon{font-size:18px;line-height:22px}
+ .studyflow-tool-text{font-size:10px;font-weight:760;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+ .content{padding-bottom:140px}
+ .topbar{z-index:16}
+ #main{min-width:0}
+ .subject-foot{flex-wrap:wrap}
+ .subject-foot button{white-space:normal;min-height:37px}
+}
+@media(max-width:370px){
+ .studyflow-mobile-tools{padding:8px 7px 9px}
+ .studyflow-tools-grid{gap:4px}
+ .studyflow-tool-text{font-size:9px}
+ .studyflow-tool-item{min-height:56px}
+}

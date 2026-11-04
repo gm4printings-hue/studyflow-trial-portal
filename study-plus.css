@@ -1,0 +1,42 @@
+
+/* StudyFlow Plus — student-facing features */
+#plusLanguage{border:1px solid #e5ddfb;background:#f8f6ff;color:#614bcb;border-radius:9px;font-size:12px;font-weight:700;padding:8px 10px;max-width:125px}
+.plus-panel{background:#fff;border:1px solid #e9e9f2;border-radius:16px;box-shadow:0 5px 20px #2d244307;padding:22px;margin:0 0 18px;overflow:hidden}
+.plus-panel h2{font-size:16px;margin:0 0 17px;color:#2f3049}
+.plus-panel h3{font-size:14px;margin:19px 0 8px;color:#4c417d}
+.plus-panel ol{padding-inline-start:22px;color:#4d5066;font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.plus-form{display:flex;flex-direction:column;gap:15px}
+.plus-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;align-items:end}
+.plus-field{display:flex;flex-direction:column;gap:7px;font-size:12px;color:#5d6179;font-weight:700;min-width:0}
+.plus-field input,.plus-field select,.plus-field textarea,.plus-task-add input{background:#fff;border:1px solid #e1e3ef;border-radius:10px;min-width:0;padding:11px 12px;font-size:13px;color:#35354a;max-width:100%}
+.plus-field textarea{resize:vertical;line-height:1.6;min-height:150px;font-weight:400}
+.plus-field input:focus,.plus-field select:focus,.plus-field textarea:focus,.plus-task-add input:focus{outline:2px solid #b9aaff;outline-offset:0}
+.plus-full{grid-column:1/-1}
+.plus-upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.plus-pdf-option{grid-column:1/-1}
+.plus-drop{border:2px dashed #cdc6f4;background:#faf9ff;color:#6145c9;border-radius:13px;text-align:center;padding:20px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;font-weight:700;font-size:14px;cursor:pointer;min-width:0}
+.plus-drop small{color:#9094aa;font-size:11px}
+.plus-drop input{max-width:95%;font-size:11px;cursor:pointer}
+.plus-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:15px 0}
+.plus-speed{font-size:11px;display:flex;align-items:center;gap:8px;color:#8d90a4}
+.plus-speed select{border:1px solid #e3def5;border-radius:7px;padding:6px;color:#6654bf}
+.plus-week-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.plus-week-grid .plus-panel{margin:0}
+.plus-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #f0eff6;font-size:12px;overflow-wrap:anywhere}
+.plus-line span{min-width:0}
+.plus-line small{font-size:11px;color:#999bb0}
+.plus-line:last-child{border:0}
+.plus-delete{background:transparent;color:#9b8eab;border:0;font-size:15px;min-width:26px;cursor:pointer}
+.plus-delete:hover{color:#b13457}
+.plus-task-add{display:flex;gap:7px;margin:15px 0 6px}
+.plus-task-add input{width:100%;min-width:0;flex:1}
+.plus-check{display:flex;gap:9px;align-items:flex-start;cursor:pointer;min-width:0}
+.plus-check input{margin-top:2px;accent-color:#6d56ea}
+.plus-done{text-decoration:line-through;color:#a4a6b4}
+.plus-exams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.plus-exams .plus-panel{margin:0}
+.plus-revision{margin:18px 0 4px;border-top:1px solid #f1edf8;padding-top:10px}
+.plus-revision .plus-line{font-size:11px}
+#plusFileList{word-break:break-word}
+@media(max-width:870px){.plus-week-grid,.plus-exams{grid-template-columns:1fr}}
+@media(max-width:550px){#plusLanguage{font-size:11px;max-width:90px;padding:7px}.plus-panel{padding:16px}.plus-grid,.plus-upload-grid{grid-template-columns:1fr}.plus-drop{padding:13px 8px}.plus-actions{gap:7px}.plus-week-grid{gap:12px}.plus-line{gap:5px}}
