@@ -7,7 +7,26 @@ const supabase=createClient(SUPABASE_URL,SUPABASE_KEY,{
 });
 const byId=id=>document.getElementById(id);
 const safe=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// Keep referral/tracking parameters out of the address bar without touching auth fragments.
+try { const u=new URL(location.href); let changed=false;
+ for(const k of [...u.searchParams.keys()]) if(/^utm_/i.test(k)){u.searchParams.delete(k);changed=true}
+ if(changed) history.replaceState(history.state,"",u.pathname+u.search+u.hash);
+} catch {}
 let studentProfile=null;
+const welcome=document.createElement("section");
+welcome.id="sfWelcome";welcome.hidden=true;welcome.setAttribute("aria-label","Student home");
+welcome.innerHTML='<h2 id="sfWelcomeTitle"></h2><p id="sfWelcomeMeta"></p><a class="sf-start-studying" href="https://curious-gaufre-4decce.netlify.app/" rel="noopener">Start studying</a><p class="sf-welcome-note">Opens the current learning demo. Lessons are saved in that browser, not yet synced to your account.</p>';
+document.querySelector(".top-actions")?.insertAdjacentElement("afterend",welcome);
+const welcomeStyle=document.createElement("style");
+welcomeStyle.textContent='#sfWelcome{background:#f3efff;border:1px solid #ded5fc;padding:18px;margin:16px 0;border-radius:14px;color:#342d58}#sfWelcome[hidden]{display:none}#sfWelcomeTitle{margin:0 0 6px;font-size:22px;color:#583dbb}#sfWelcomeMeta{margin:3px 0 16px}#sfWelcome .sf-start-studying{display:block;background:#6750d7;padding:13px 14px;color:white;text-align:center;text-decoration:none;border-radius:10px;font-weight:800}#sfWelcome .sf-welcome-note{font-size:11px;line-height:1.55;margin:12px 0 0;color:#6e6783}';
+document.head.append(welcomeStyle);
+function renderWelcome(){
+ const name=studentProfile?.display_name?.trim();
+ welcome.hidden=!name;
+ if(!name)return;
+ byId("sfWelcomeTitle").textContent="Welcome, "+name+"!";
+ byId("sfWelcomeMeta").textContent=studentProfile.academic_class+" · "+studentProfile.plan+" trial";
+}
 const trigger=document.createElement("button");
 trigger.type="button";trigger.id="sfTrialButton";trigger.className="sf-trial-entry";
 trigger.textContent="Student trial login";
@@ -54,6 +73,7 @@ function renderProfile(){
   target.hidden=true;
   redeem.hidden=false;
   trigger.textContent="Student trial login";
+  renderWelcome();
   return;
  }
  auth.hidden=true;redeem.hidden=true;target.hidden=false;
@@ -73,13 +93,17 @@ function renderProfile(){
    if(!user){message("Please sign in again.",true);return}
    const {error}=await supabase.from("sf_student_profiles").update({display_name:value}).eq("user_id",user.id);
    if(error){showError(error);return}
-   await refreshProfile();message("Student name saved.");
+   await refreshProfile();
+   message("Student name saved.");
+   if(dlg.open)dlg.close();
+   window.scrollTo({top:0,behavior:"smooth"});
  });
  byId("sfTrialSignout").addEventListener("click",async()=>{
   await supabase.auth.signOut();
   studentProfile=null;auth.hidden=false;renderProfile();message("Signed out.");
  });
  trigger.textContent=(studentProfile.display_name||"Student")+" · "+studentProfile.plan;
+ renderWelcome();
 }
 async function refreshProfile(){
  const {data:{user},error}=await supabase.auth.getUser();
@@ -141,3 +165,4 @@ supabase.auth.onAuthStateChange((_event,_session)=>{
 });
 refreshProfile().catch(showError);
 window.StudyFlowTrial={open:()=>dlg.showModal(),getProfile:()=>studentProfile};
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}

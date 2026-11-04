@@ -1,0 +1,25 @@
+{
+  "id": "/studyflow-trial-portal/",
+  "name": "StudyFlow Trial",
+  "short_name": "StudyFlow",
+  "description": "Student trial account and access to StudyFlow learning demo",
+  "start_url": "/studyflow-trial-portal/",
+  "scope": "/studyflow-trial-portal/",
+  "display": "standalone",
+  "background_color": "#f5f2ff",
+  "theme_color": "#6a4fde",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
