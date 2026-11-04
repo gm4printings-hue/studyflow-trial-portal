@@ -58,16 +58,28 @@ function renderProfile(){
  }
  auth.hidden=true;redeem.hidden=true;target.hidden=false;
  target.innerHTML=`<b>${safe(studentProfile.plan)} — trial active</b>
+ <div>Student: <strong>${safe(studentProfile.display_name||"Name not added")}</strong></div>
  <div>Class: ${safe(studentProfile.academic_class)}</div>
+ <label>Student display name (first name or nickname) <input id="sfStudentName" type="text" maxlength="40" autocomplete="nickname" placeholder="First name or nickname" value="${safe(studentProfile.display_name||"")}"></label>
+ <button type="button" id="sfSaveStudentName">Save student name</button>
  <div>Starting allocation: ${Number(studentProfile.initial_credits).toLocaleString("en")} provisional Study Credits</div>
  <div>Spent: ${Number(studentProfile.spent_credits).toLocaleString("en")} credits</div>
  <small>Credit rates are under validation; AI generation is not yet enabled. Lesson files remain on this device.</small>
  <button type="button" id="sfTrialSignout">Sign out</button>`;
+ byId("sfSaveStudentName").addEventListener("click",async()=>{
+   const value=byId("sfStudentName").value.trim();
+   if(value.length<2||value.length>40){message("Enter a first name or nickname (2–40 characters).",true);return}
+   const {data:{user}}=await supabase.auth.getUser();
+   if(!user){message("Please sign in again.",true);return}
+   const {error}=await supabase.from("sf_student_profiles").update({display_name:value}).eq("user_id",user.id);
+   if(error){showError(error);return}
+   await refreshProfile();message("Student name saved.");
+ });
  byId("sfTrialSignout").addEventListener("click",async()=>{
   await supabase.auth.signOut();
   studentProfile=null;auth.hidden=false;renderProfile();message("Signed out.");
  });
- trigger.textContent=studentProfile.plan+" trial";
+ trigger.textContent=(studentProfile.display_name||"Student")+" · "+studentProfile.plan;
 }
 async function refreshProfile(){
  const {data:{user},error}=await supabase.auth.getUser();
@@ -78,7 +90,7 @@ async function refreshProfile(){
  }
  auth.hidden=true;
  const {data,error:readError}=await supabase.from("sf_student_profiles")
-  .select("plan,academic_class,academic_year,initial_credits,spent_credits,theme").eq("user_id",user.id).maybeSingle();
+  .select("plan,academic_class,academic_year,initial_credits,spent_credits,theme,display_name").eq("user_id",user.id).maybeSingle();
  if(readError)throw readError;
  studentProfile=data;
  renderProfile();
