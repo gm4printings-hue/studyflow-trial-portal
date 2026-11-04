@@ -38,7 +38,7 @@ function renderLesson(){
  return '<div class="page-heading"><div><p class="eyebrow">STUDYFLOW</p><h1>'+t("heading")+'</h1><p class="intro">'+t("hint")+'</p></div></div>'+
  box(t("lesson"),'<form id="plusLessonForm" class="plus-form"><div class="plus-grid"><label class="plus-field">'+t("subject")+subjectSelect(lesson.subject||"")+'</label>'+
  field(t("book"),"book",lesson.book||"")+field(t("grade"),"grade",lesson.grade||"")+field(t("pages"),"pages",lesson.pages||"")+
- '<label class="plus-field">'+t("mode")+'<select name="mode"><option value="both">'+t("both")+'</option><option value="written">'+t("written")+'</option><option value="voice">'+t("voice")+'</option></select></label></div>'+
+ '<label class="plus-field">'+t("mode")+'<select name="mode"><option value="written">Chat</option><option value="voice">'+t("voice")+'</option><option value="both">'+t("both")+'</option></select></label></div>'+
  '<label class="plus-field plus-ocr-language">'+t("bookLanguage")+'<select id="plusOcrLang" name="ocrLang"><option value="eng">English</option><option value="fra">Français</option><option value="ara">Arabic</option></select></label><div class="plus-upload-grid"><label class="plus-drop">🖼️ '+t("gallery")+'<input type="file" id="plusPhotos" accept="image/*" multiple><small>JPG, PNG, WEBP</small></label>'+
  '<label class="plus-drop">📷 '+t("camera")+'<input type="file" id="plusCamera" accept="image/*" capture="environment"><small>Take a new picture</small></label>'+
  '<label class="plus-drop plus-pdf-option">📄 '+t("pdf")+'<input type="file" id="plusPDF" accept=".pdf,application/pdf"><small>Text PDF or scanned PDF</small></label></div>'+
