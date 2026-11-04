@@ -5,6 +5,8 @@ const SUPABASE_KEY="sb_publishable_EK9oy2SvD7dJmIolMUDCcw_ru1IZxO8";
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY,{
  auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}
 });
+const invitation=new URL(location.href).searchParams.get("invite")?.trim().toUpperCase();
+const validInvitation=invitation&&/^SF-TRIAL-[A-F0-9]{24}$/.test(invitation)?invitation:null;
 const byId=id=>document.getElementById(id);
 const safe=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 // Keep referral/tracking parameters out of the address bar without touching auth fragments.
@@ -21,9 +23,9 @@ const welcomeStyle=document.createElement("style");
 welcomeStyle.textContent='#sfWelcome{background:#f3efff;border:1px solid #ded5fc;padding:18px;margin:16px 0;border-radius:14px;color:#342d58}#sfWelcome[hidden]{display:none}#sfWelcomeTitle{margin:0 0 6px;font-size:22px;color:#583dbb}#sfWelcomeMeta{margin:3px 0 16px}#sfWelcome .sf-start-studying{display:block;background:#6750d7;padding:13px 14px;color:white;text-align:center;text-decoration:none;border-radius:10px;font-weight:800}#sfWelcome .sf-welcome-note{font-size:11px;line-height:1.55;margin:12px 0 0;color:#6e6783}';
 document.head.append(welcomeStyle);
 function renderWelcome(){
- const name=studentProfile?.display_name?.trim();
- welcome.hidden=!name;
- if(!name)return;
+ const name=studentProfile?.display_name?.trim()||"Student";
+ welcome.hidden=!studentProfile;
+ if(!studentProfile)return;
  byId("sfWelcomeTitle").textContent="Welcome, "+name+"!";
  byId("sfWelcomeMeta").textContent=studentProfile.academic_class+" · "+studentProfile.plan+" trial";
 }
@@ -56,6 +58,7 @@ dlg.innerHTML=`
  <p class="sf-auth-footer">The class is locked after activation. Account and plan are stored in STUDYFLOW; existing lesson and planner data are still local to this browser. AI tutoring and downloadable MP3 are not activated yet. Only use a student/parent email with appropriate consent.</p>
 `;
 document.body.appendChild(dlg);
+if(validInvitation)byId("sfRedeemForm").elements.code.value=validInvitation;
 trigger.addEventListener("click",()=>{dlg.showModal();refreshProfile().catch(showError)});
 byId("sfAuthClose").addEventListener("click",()=>dlg.close());
 dlg.addEventListener("click",ev=>{if(ev.target===dlg)dlg.close()});
@@ -71,13 +74,14 @@ function renderProfile(){
  if(!target)return;
  if(!studentProfile){
   target.hidden=true;
-  redeem.hidden=false;
+  redeem.hidden= !auth.hidden;
   trigger.textContent="Student trial login";
   renderWelcome();
   return;
  }
  auth.hidden=true;redeem.hidden=true;target.hidden=false;
  target.innerHTML=`<b>${safe(studentProfile.plan)} — trial active</b>
+ <p><a class="sf-start-studying" href="./study.html">Start studying</a></p>
  <div>Student: <strong>${safe(studentProfile.display_name||"Name not added")}</strong></div>
  <div>Class: ${safe(studentProfile.academic_class)}</div>
  <label>Student display name (first name or nickname) <input id="sfStudentName" type="text" maxlength="40" autocomplete="nickname" placeholder="First name or nickname" value="${safe(studentProfile.display_name||"")}"></label>
@@ -110,7 +114,7 @@ async function refreshProfile(){
  if(error&&error.name!=="AuthSessionMissingError")throw error;
  const auth=byId("sfAuthForm");
  if(!user){
-  studentProfile=null;auth.hidden=false;renderProfile();return;
+  studentProfile=null;auth.hidden=false;renderProfile();message("Sign in with your own email and password, or choose Create account.");return;
  }
  auth.hidden=true;
  const {data,error:readError}=await supabase.from("sf_student_profiles")
@@ -132,7 +136,9 @@ byId("sfAuthForm").addEventListener("submit",async e=>{
  for(const btn of form.querySelectorAll("button"))btn.disabled=true;
  try{
   if(mode==="signup"){
-   const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
+   const redirect=new URL(location.pathname,location.origin);
+   if(validInvitation)redirect.searchParams.set("invite",validInvitation);
+   const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:redirect.href}});
    if(error)throw error;
    if(!data?.session){message("Check the email inbox and confirm the signup, then return here to Sign in.");return}
    message("Account created. You may now activate your invitation.");
@@ -142,6 +148,7 @@ byId("sfAuthForm").addEventListener("submit",async e=>{
    message("Signed in.");
   }
   await refreshProfile();
+  if(studentProfile && mode==="login")dlg.close();
  }catch(err){showError(err)}finally{for(const btn of form.querySelectorAll("button"))btn.disabled=false}
 });
 byId("sfRedeemForm").addEventListener("submit",async e=>{
@@ -161,7 +168,8 @@ byId("sfRedeemForm").addEventListener("submit",async e=>{
  }catch(err){showError(err)}finally{button.disabled=false}
 });
 supabase.auth.onAuthStateChange((_event,_session)=>{
- Promise.resolve().then(()=>refreshProfile()).catch(showError);
+ // Run after the auth callback releases its session lock.
+ setTimeout(()=>refreshProfile().catch(showError),0);
 });
 refreshProfile().catch(showError);
 window.StudyFlowTrial={open:()=>dlg.showModal(),getProfile:()=>studentProfile};
