@@ -19,7 +19,7 @@ try{data=JSON.parse(window.StudyFlowStudentStore.get(KEY))}catch{}
 if(!data||typeof data!=="object")data={lang:"en",classes:[],items:[],exams:[],lesson:null};
 data.lang=messages[data.lang]?data.lang:"en";
 for(const k of ["classes","items","exams"])if(!Array.isArray(data[k]))data[k]=[];
-let selectedSubject="",active=null,lastVoice="",reading=false,ocrWorker=null,notified=new Set();
+let selectedSubject="",active=null,lastVoice="",reading=false,ocrWorker=null,readInFlight=false,notified=new Set();
 const t=(key)=>messages[data.lang][key]||messages.en[key]||key;
 function save(){try{window.StudyFlowStudentStore.set(KEY,JSON.stringify(data))}catch{alert("Browser storage full. Please export/clear older data.")}}
 function legacySubjects(){try{return JSON.parse(window.StudyFlowStudentStore.get(ORIGINAL))?.subjects||[]}catch{return []}}
@@ -49,6 +49,18 @@ function renderLesson(){
  '<p class="helper">'+t("share")+'</p>')+
  (lesson.result?renderExplanation(lesson):'');
 }
+function readableSource(text){
+ const tokens=String(text||"").trim().split(/\s+/).filter(Boolean);
+ if(tokens.length<8)return false;
+ const compact=tokens.join("");
+ const letters=(compact.match(/\p{L}/gu)||[]).length;
+ const words=tokens.filter(token=>{
+  const clean=token.replace(/^[^\p{L}]+|[^\p{L}]+$/gu,"");
+  return /^[\p{L}]+(?:['’\-][\p{L}]+)*$/u.test(clean)&&clean.length>=3;
+ }).length;
+ return letters/Math.max(1,compact.length)>=.65 && words/tokens.length>=.38;
+}
+const readWarning=()=>data.lang==="azi"?"El text mesh ma2rou2 bi woudo7. Jarrib soura awda7, ta2akkad men language el saf7a, aw sa77e7 el text. Ma fina na3mil summary aw voice men text mkharbat.":"The page text is not clear enough. Try a sharper photo, check the printed page language, or correct the extracted text. No study guide or voice will be created from unreadable text.";
 function extractGuide(text,subject,book,pages){
  let clean=String(text||"").replace(/\s+/g," ").trim().slice(0,24000);
  let sentences=clean.match(/[^.!?؟؛\n]+[.!?؟؛]?/g)||[clean];
@@ -63,6 +75,7 @@ function extractGuide(text,subject,book,pages){
  return {summary,keys,questions,sourceChars:clean.length};
 }
 function renderExplanation(lesson){
+ if(!readableSource(lesson.text)){lastVoice="";return box(t("result"),'<p class="callout neutral" role="alert">'+html(readWarning())+'</p>')}
  const x=lesson.result;lastVoice=(x.summary||[]).join(". ");
  return box(t("result"),'<div class="callout neutral">'+t("localGuide")+'</div>'+
  '<p class="helper">'+html((lesson.subject||"")+" · "+(lesson.book||"")+" "+(lesson.pages||""))+'</p>'+
@@ -130,7 +143,36 @@ async function ocrPhoto(file){
  }
  let im=await createImageBitmap(file),w=Math.min(1800,im.width),h=Math.round(im.height*w/im.width);
  let cvs=document.createElement("canvas");cvs.width=w;cvs.height=h;cvs.getContext("2d").drawImage(im,0,0,w,h);im.close?.();
- const r=await ocrWorker.recognize(cvs);return String(r.data.text||"").trim();
+ let best=(await ocrWorker.recognize(cvs)).data;
+ // Retry faint/uneven photographs at a bounded higher resolution.
+ if(best.confidence<85||!readableSource(best.text)){
+  const scale=Math.min(2,2400/Math.max(cvs.width,cvs.height));
+  const enhanced=document.createElement("canvas");enhanced.width=Math.round(cvs.width*scale);enhanced.height=Math.round(cvs.height*scale);
+  const ctx=enhanced.getContext("2d",{willReadFrequently:true});ctx.drawImage(cvs,0,0,enhanced.width,enhanced.height);
+  const pixels=ctx.getImageData(0,0,enhanced.width,enhanced.height),p=pixels.data;
+  const width=enhanced.width,height=enhanced.height,stride=width+1;
+  const gray=new Uint8Array(width*height),sum=new Float64Array(stride*(height+1));
+  for(let y=0;y<height;y++){
+   let row=0;
+   for(let x=0;x<width;x++){
+    const i=y*width+x,j=i*4;gray[i]=Math.round(.299*p[j]+.587*p[j+1]+.114*p[j+2]);row+=gray[i];
+    sum[(y+1)*stride+x+1]=sum[y*stride+x+1]+row;
+   }
+  }
+  const radius=24;
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+   const left=Math.max(0,x-radius),right=Math.min(width,x+radius+1),top=Math.max(0,y-radius),bottom=Math.min(height,y+radius+1);
+   const mean=(sum[bottom*stride+right]-sum[top*stride+right]-sum[bottom*stride+left]+sum[top*stride+left])/((right-left)*(bottom-top));
+   const i=y*width+x,j=i*4,value=gray[i]<mean-12?0:255;p[j]=p[j+1]=p[j+2]=value;
+  }
+  ctx.putImageData(pixels,0,0);
+  try{
+   const candidate=(await ocrWorker.recognize(enhanced)).data;
+   if(readableSource(candidate.text)&&(!readableSource(best.text)||candidate.confidence>best.confidence))best=candidate;
+  }catch(error){console.warn("Photo enhancement retry failed",String(error))}
+ }
+ if(best.confidence<70||!readableSource(best.text))throw Error("Photo text quality is too low to use safely");
+ return String(best.text||"").trim();
 }
 async function pdfText(file){
  let lib=await import("./pdf.mjs");lib.GlobalWorkerOptions.workerSrc="./pdf.worker.mjs";
@@ -148,9 +190,10 @@ async function pdfText(file){
  await doc.destroy();return parts.join("\n\n").slice(0,50000);
 }
 async function doRead(){
+ if(readInFlight){notice(t("ocrPending"));return}
  const files=currentFiles();if(!files.length){notice(t("noText"));return}
  if(files.length>12||files.some(f=>f.size>12*1024*1024)){notice(t("uploadLimit"));return}
- let b=$("#plusExtract"),originForm=$("#plusLessonForm");if(!b)return;b.disabled=true;
+ let b=$("#plusExtract"),originForm=$("#plusLessonForm");if(!b)return;readInFlight=true;b.disabled=true;
  let parts=[],fails=0;$("#plusFileList").textContent=t("ocrPending");
  try{
   for(const f of files){
@@ -168,10 +211,10 @@ async function doRead(){
       save();
       notice("Lesson text saved. Open Explain to continue.");
     }
-  }else notice(t("ocrBad")+" "+t("pdfBad"));
+  }else notice(readWarning());
   const feedback=$("#plusFileList");
-  if(feedback)feedback.textContent=parts.length+" page(s) read"+(fails?", "+fails+" failed":"")+". "+t("share");
- }finally{b.disabled=false}
+  if(feedback)feedback.textContent=parts.length?parts.length+" file(s) read"+(fails?", "+fails+" failed":"")+". Review and correct the text below before creating a study guide.":readWarning();
+ }finally{readInFlight=false;b.disabled=false}
 }
 function createICS(ex){
  const esc=s=>String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");
@@ -221,15 +264,18 @@ function inject(){
   const f=e.target;if(!active||!f.matches("#plusLessonForm,#plusClassForm,#plusExamForm,.plusTaskForm"))return;
   e.preventDefault();const v=new FormData(f);
   if(f.id==="plusLessonForm"){
+   if(readInFlight){notice(t("ocrPending"));return}
    let text=String(v.get("text")||"").trim().slice(0,50000);
    if(!text&&currentFiles().length){
     const submit=f.querySelector('button[type="submit"]');
     if(submit)submit.disabled=true;
     try{await doRead()}finally{if(submit?.isConnected)submit.disabled=false}
     if(!f.isConnected||active!=="lesson")return;
-    text=String(f.querySelector('[name="text"]')?.value||"").trim().slice(0,50000);
+    notice(f.querySelector('[name="text"]')?.value.trim()?"Review and correct the extracted text, then press Create study explanation again.":readWarning());
+    return;
    }
    if(!text){notice(t("noText"));return}
+   if(!readableSource(text)){notice(readWarning());return}
    const s=String(v.get("subject")||"Other");
    let lesson={subject:s,book:String(v.get("book")||"").slice(0,150),grade:String(v.get("grade")||"").slice(0,40),pages:String(v.get("pages")||"").slice(0,80),mode:v.get("mode"),text:text.slice(0,30000),result:extractGuide(text,s,v.get("book"),v.get("pages"))};
    data.lesson=lesson;save();render();notice(t("lessonSaved"));if(lesson.mode!=="written")voice();
