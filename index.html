@@ -42,16 +42,16 @@
             const [isRegistering, setIsRegistering] = React.useState(false);
             const [loginInput, setLoginInput] = React.useState('');
             const [passInput, setPassInput] = React.useState('');
-            const [showPassword, setShowPassword] = React.useState(false); // Show/Hide password toggle
-            const [rememberMe, setRememberMe] = React.useState(true); // Remember login state
+            const [showPassword, setShowPassword] = React.useState(false);
+            const [rememberMe, setRememberMe] = React.useState(true);
             const [authError, setAuthError] = React.useState('');
             const [authSuccess, setAuthSuccess] = React.useState('');
 
             const [lang, setLang] = React.useState('en');
             const [explLang, setExplLang] = React.useState('auto');
 
-            // ⚠️ استبدل "YOUR_GEMINI_API_KEY_HERE" بمفتاح الـ API الحقيقي الخاص بك هنا:
-            const systemApiKey = "YOUR_GEMINI_API_KEY_HERE";
+            // System Gemini API Key Configured
+            const systemApiKey = "AQ.Ab8RN6KP75gDc2-LPeQGrjy8bVXVOPsEI2bs6qgiv3DVopP-7w";
 
             const [selectedCategory, setSelectedCategory] = React.useState('math');
             const [notes, setNotes] = React.useState('');
@@ -133,10 +133,6 @@
             };
 
             const handleGeminiCall = async () => {
-                if (systemApiKey === "YOUR_GEMINI_API_KEY_HERE" || !systemApiKey) {
-                    alert('System Error: Please configure your Gemini API Key in the code.');
-                    return;
-                }
                 if (!notes.trim() && !attachedImage) {
                     alert('Please enter text or upload an image.');
                     return;
