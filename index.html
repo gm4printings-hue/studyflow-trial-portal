@@ -34,17 +34,23 @@
                 ];
             });
 
-            const [currentUser, setCurrentUser] = React.useState(null);
+            // Remember Me persistence check
+            const [currentUser, setCurrentUser] = React.useState(() => {
+                return localStorage.getItem('studyflow_active_user') || sessionStorage.getItem('studyflow_active_user') || null;
+            });
+
             const [isRegistering, setIsRegistering] = React.useState(false);
             const [loginInput, setLoginInput] = React.useState('');
             const [passInput, setPassInput] = React.useState('');
+            const [showPassword, setShowPassword] = React.useState(false); // Show/Hide password toggle
+            const [rememberMe, setRememberMe] = React.useState(true); // Remember login state
             const [authError, setAuthError] = React.useState('');
             const [authSuccess, setAuthSuccess] = React.useState('');
 
             const [lang, setLang] = React.useState('en');
             const [explLang, setExplLang] = React.useState('auto');
 
-            // ⚠️ PLACE YOUR ACTUAL GEMINI API KEY INSIDE THE QUOTES BELOW:
+            // System Gemini API Key (Hidden from students)
             const systemApiKey = "YOUR_GEMINI_API_KEY_HERE";
 
             const [selectedCategory, setSelectedCategory] = React.useState('math');
@@ -71,6 +77,11 @@
                 const found = usersList.find(u => u.username === loginInput.trim() && u.pass === passInput.trim());
                 if (found) {
                     setCurrentUser(found.username);
+                    if (rememberMe) {
+                        localStorage.setItem('studyflow_active_user', found.username);
+                    } else {
+                        sessionStorage.setItem('studyflow_active_user', found.username);
+                    }
                     setLoginInput('');
                     setPassInput('');
                 } else {
@@ -108,6 +119,8 @@
 
             const handleLogout = () => {
                 setCurrentUser(null);
+                localStorage.removeItem('studyflow_active_user');
+                sessionStorage.removeItem('studyflow_active_user');
             };
 
             const handleFileUpload = (e) => {
@@ -120,10 +133,6 @@
             };
 
             const handleGeminiCall = async () => {
-                if (systemApiKey === "YOUR_GEMINI_API_KEY_HERE" || !systemApiKey) {
-                    alert('System Error: Gemini API Key is missing in the code configuration.');
-                    return;
-                }
                 if (!notes.trim() && !attachedImage) {
                     alert('Please enter text or upload an image.');
                     return;
@@ -178,7 +187,7 @@
                 }
             };
 
-            // LOGIN / CREATE ACCOUNT GATE
+            // LOGIN / CREATE ACCOUNT GATE WITH SHOW/HIDE PASS & REMEMBER ME
             if (!currentUser) {
                 return (
                     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6">
@@ -189,7 +198,7 @@
                                 </h1>
                                 <p className="text-xs text-slate-400 mt-1">Powered by Distingstyle Ltd</p>
                                 <span className="inline-block mt-3 px-3 py-1 bg-blue-950 text-blue-400 border border-blue-800 text-xs rounded-full font-mono">
-                                    🔒 1 User per Account Protection
+                                    🔒 Secure Access Gateway
                                 </span>
                             </div>
 
@@ -219,15 +228,39 @@
                                 </div>
                                 <div>
                                     <label className="block text-xs text-slate-400 mb-1">Password</label>
-                                    <input 
-                                        type="password" 
-                                        placeholder="••••••••"
-                                        value={passInput}
-                                        onChange={(e) => setPassInput(e.target.value)}
-                                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500"
-                                        required
-                                    />
+                                    <div className="relative">
+                                        <input 
+                                            type={showPassword ? "text" : "password"} 
+                                            placeholder="••••••••"
+                                            value={passInput}
+                                            onChange={(e) => setPassInput(e.target.value)}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500 pr-10"
+                                            required
+                                        />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-200 text-xs"
+                                        >
+                                            {showPassword ? "🙈 Hide" : "👁️ Show"}
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {!isRegistering && (
+                                    <div className="flex items-center justify-between text-xs text-slate-400">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={rememberMe} 
+                                                onChange={(e) => setRememberMe(e.target.checked)}
+                                                className="rounded bg-slate-950 border-slate-700 text-blue-600 focus:ring-0"
+                                            />
+                                            Remember Login
+                                        </label>
+                                    </div>
+                                )}
+
                                 <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-lg">
                                     {isRegistering ? 'Create New Account' : 'Login to StudyFlow'}
                                 </button>
@@ -370,7 +403,7 @@
 
                         {summary && (
                             <div className="mt-6 p-4 bg-slate-950 border border-slate-800 rounded-lg relative">
-                                <div className="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+                                <div className="flex بجانب justify-between items-center mb-3 border-b border-slate-800 pb-2">
                                     <h3 className="font-semibold text-blue-400 text-sm">Explanation Result:</h3>
                                     <button onClick={handleSpeak} className="bg-indigo-900/60 hover:bg-indigo-800 border border-indigo-700/50 text-indigo-200 px-3 py-1 rounded text-xs">
                                         {isSpeaking ? '⏹️ Stop' : '🔊 Listen'}
