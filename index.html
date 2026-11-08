@@ -57,12 +57,6 @@
             const [isSpeaking, setIsSpeaking] = React.useState(false);
             const [attachedImage, setAttachedImage] = React.useState(null);
 
-            // Interactive choice states for student workflow
-            const [interactiveOptions, setInteractiveOptions] = React.useState([
-                { id: 1, text: "Review Core Formulas & Definitions", active: true },
-                { id: 2, text: "Step-by-Step Problem Walkthrough", active: true },
-                { id: 3, text: "Practice Quiz & Knowledge Check", active: true }
-            ]);
             const [selectedOptionId, setSelectedOptionId] = React.useState(null);
 
             const categories = [
@@ -148,7 +142,7 @@
                 setSelectedOptionId(null);
                 
                 try {
-                    let targetLangInstruction = explLang === 'auto' ? "Match the language of the notes." : `Explain in ${explLang}.`;
+                    let targetLangInstruction = explLang === 'auto' ? "Detect and match the exact language of the student's notes or image (e.g. French if notes are in French)." : `Explain strictly in ${explLang}.`;
                     const promptText = `Expert tutor in ${currentCatObj.nameEn}. ${targetLangInstruction} Provide direct step-by-step academic explanation and key takeaway for: ${notes}`;
 
                     let contentParts = [{ text: promptText }];
@@ -168,50 +162,67 @@
                     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
                         setSummary(data.candidates[0].content.parts[0].text);
                     } else {
-                        generateStructuredExplanation();
+                        generateLocalizedExplanation(explLang);
                     }
                 } catch (err) {
-                    generateStructuredExplanation();
+                    generateLocalizedExplanation(explLang);
                 }
                 setLoading(false);
             };
 
-            const generateStructuredExplanation = () => {
+            const generateLocalizedExplanation = (languageChoice) => {
                 const subject = currentCatObj.nameEn;
                 const hasImage = !!attachedImage;
                 const inputText = notes.trim();
 
-                let output = `🎓 ${subject} - Academic Breakdown\n\n`;
-
-                if (hasImage && inputText) {
-                    output += `📌 Overview:\n- Analyzing uploaded lesson materials: "${inputText}"\n\n`;
-                } else if (hasImage) {
-                    output += `📌 Overview:\n- Analyzing visual diagram and lesson sheet.\n\n`;
+                // Multi-language localization support
+                if (languageChoice === 'French' || languageChoice === 'fr') {
+                    let output = `🎓 ${subject} - Analyse Académique\n\n`;
+                    output += `📌 Aperçu:\n- Analyse du contenu et des notes du cours: "${inputText || 'Document joint'}"\n\n`;
+                    output += `💡 Explication Étape par Étape:\n`;
+                    output += `1. Définitions Clés: Compréhension des principes fondamentaux.\n`;
+                    output += `2. Méthodologie: Approche logique pour résoudre et interpréter le sujet.\n`;
+                    output += `3. Vérification Pratique: Application des formules et des règles.\n\n`;
+                    output += `✅ Conclusion:\nLa maîtrise de ces concepts garantit une excellente préparation aux examens.`;
+                    setSummary(output);
+                } else if (languageChoice === 'Arabic' || languageChoice === 'ar') {
+                    let output = `🎓 ${subject} - التحليل الأكاديمي\n\n`;
+                    output += `📌 نظرة عامة:\n- تحليل محتوى الدرس والملاحظات: "${inputText || 'المستند المرفق'}"\n\n`;
+                    output += `💡 الشرح خطوة بخطوة:\n`;
+                    output += `1. المفاهيم الأساسية: فهم المبادئ والتعريفات الأولية.\n`;
+                    output += `2. المنهجية التطبيقية: الخطوات المنطقية لحل وفهم الدرس.\n`;
+                    output += `3. التحقق العملي: مراجعة القواعد والنتائج المتوقعة.\n\n`;
+                    output += `✅ الخلاصة:\nإتقان هذه المبادئ يضمن الاستعداد التام للاختبارات الأكاديمية.`;
+                    setSummary(output);
                 } else {
-                    output += `📌 Overview:\n- Analyzing topic: "${inputText}"\n\n`;
+                    let output = `🎓 ${subject} - Academic Breakdown\n\n`;
+                    output += `📌 Overview:\n- Analyzing lesson materials: "${inputText || 'Attached document'}"\n\n`;
+                    output += `💡 Step-by-Step Explanation:\n`;
+                    output += `1. Core Definitions: Establishing fundamental principles.\n`;
+                    output += `2. Methodology & Application: Logical steps required to solve or interpret the lesson.\n`;
+                    output += `3. Practical Verification: Reviewing formulas and rules.\n\n`;
+                    output += `✅ Key Takeaway:\nMastering these concepts ensures solid readiness for academic assessments.`;
+                    setSummary(output);
                 }
-
-                output += `💡 Step-by-Step Explanation:\n`;
-                output += `1. Core Definitions: Establishing fundamental principles and initial concepts.\n`;
-                output += `2. Methodology & Application: Breaking down the logical steps required to solve or interpret the lesson.\n`;
-                output += `3. Practical Verification: Reviewing formulas, rules, and expected outcomes.\n\n`;
-                output += `✅ Key Takeaway:\nMastering these concepts ensures solid readiness for academic assessments and practical coursework.`;
-
-                setSummary(output);
             };
 
-            const handleOptionSelect = (option) => {
-                setSelectedOptionId(option.id);
-                // Interactive response tailored to the selected choice
-                let dynamicReply = `🔍 Interactive Focus Selected: [ ${option.text} ]\n\n`;
-                if (option.id === 1) {
-                    dynamicReply += `📖 Core Definitions & Formulas:\n- Reviewing fundamental theorems and glossary terms.\n- Ensuring precise syntax and mathematical/scientific notation.\n\n✅ Ready for application exercises.`;
-                } else if (option.id === 2) {
-                    dynamicReply += `⚡ Step-by-Step Walkthrough:\n- Step 1: Isolate variables and identify given parameters.\n- Step 2: Apply the governing equation or historical context.\n- Step 3: Compute final outcome and verify units.\n\n✅ Problem successfully solved.`;
+            const handleOptionSelect = (optionId) => {
+                setSelectedOptionId(optionId);
+                let reply = "";
+                if (explLang === 'French' || explLang === 'fr') {
+                    if (optionId === 1) reply = "📖 Focus: Révision des formules fondamentales et des définitions clés.";
+                    else if (optionId === 2) reply = "⚡ Focus: Résolution guidée étape par étape avec application pratique.";
+                    else reply = "📝 Focus: Quiz d'évaluation des connaissances et exercices de pratique.";
+                } else if (explLang === 'Arabic' || explLang === 'ar') {
+                    if (optionId === 1) reply = "📖 التركيز: مراجعة القواعد الأساسية والتعريفات الهامة.";
+                    else if (optionId === 2) reply = "⚡ التركيز: شرح تفصيلي خطوة بخطوة مع التطبيق العملي.";
+                    else reply = "📝 التركيز: اختبار قصير للتحقق من الفهم وحل التمارين.";
                 } else {
-                    dynamicReply += `📝 Knowledge Check / Practice:\n- Question: How do these principles apply to real-world scenarios?\n- Answer: By maintaining rigorous structural integrity and systematic evaluation.\n\n✅ Assessment complete.`;
+                    if (optionId === 1) reply = "📖 Focus Selected: Core formulas review & definitions breakdown.";
+                    else if (optionId === 2) reply = "⚡ Focus Selected: Step-by-step problem-solving walkthrough.";
+                    else reply = "📝 Focus Selected: Practice quiz and knowledge verification check.";
                 }
-                setSummary(dynamicReply);
+                setSummary(prev => prev + `\n\n--- \n✨ ${reply}`);
             };
 
             const handleSpeak = () => {
@@ -388,8 +399,8 @@
                                     className="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded px-2 py-1 focus:outline-none focus:border-blue-500"
                                 >
                                     <option value="auto">🔄 Auto (Match)</option>
-                                    <option value="English">🇬🇧 English</option>
                                     <option value="French">🇫🇷 Français</option>
+                                    <option value="English">🇬🇧 English</option>
                                     <option value="Arabic">🇸🇦 العربية</option>
                                 </select>
                             </div>
@@ -450,20 +461,29 @@
                                         {isSpeaking ? '⏹️ Stop' : '🔊 Listen'}
                                     </button>
                                 </div>
-                                
-                                {/* Interactive Options Bar for Student Action */}
+
+                                {/* Interactive Action Buttons for Student */}
                                 <div className="mb-4 p-3 bg-slate-900 border border-slate-800 rounded-lg">
-                                    <p className="text-xs text-slate-400 mb-2 font-medium">💡 Choose a study focus or follow-up action:</p>
+                                    <p className="text-xs text-slate-400 mb-2 font-medium">💡 Click an option to interact with the lesson:</p>
                                     <div className="flex flex-wrap gap-2">
-                                        {interactiveOptions.map((opt) => (
-                                            <button
-                                                key={opt.id}
-                                                onClick={() => handleOptionSelect(opt)}
-                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${selectedOptionId === opt.id ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'}`}
-                                            >
-                                                {opt.text}
-                                            </button>
-                                        ))}
+                                        <button 
+                                            onClick={() => handleOptionSelect(1)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedOptionId === 1 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'}`}
+                                        >
+                                            1. Core Formulas & Rules
+                                        </button>
+                                        <button 
+                                            onClick={() => handleOptionSelect(2)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedOptionId === 2 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'}`}
+                                        >
+                                            2. Step-by-Step Guide
+                                        </button>
+                                        <button 
+                                            onClick={() => handleOptionSelect(3)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedOptionId === 3 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'}`}
+                                        >
+                                            3. Practice & Quiz
+                                        </button>
                                     </div>
                                 </div>
 
@@ -473,7 +493,7 @@
                     </div>
 
                     <footer className="text-center text-xs text-slate-600 pt-4 border-t border-slate-900">
-                        StudyFlow Platform © 2026. A Product by Distingstyle Ltd. All rights reserved.
+                        StudyFlow Platform © 2026. All rights reserved.
                     </footer>
                 </div>
             );
