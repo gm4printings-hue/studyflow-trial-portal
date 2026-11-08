@@ -139,69 +139,50 @@
                 setSelectedOptionId(null);
 
                 setTimeout(() => {
-                    generateDetailedSolution(explLang, currentCatObj.nameEn, notes, attachedImage);
+                    generateBaseSolution(explLang, currentCatObj.nameEn);
                     setLoading(false);
                 }, 600);
             };
 
-            const generateDetailedSolution = (languageChoice, subject, userNotes, hasImage) => {
-                const customText = userNotes.trim() ? userNotes : "Exercice scanné / Problème soumis";
-
+            const generateBaseSolution = (languageChoice, subject) => {
                 if (languageChoice === 'French' || languageChoice === 'fr') {
-                    let output = `📚 ${subject} - Solution Détaillée de l'Exercice\n\n`;
-                    output += `🔍 Énoncé analysé :\n« ${customText} »\n\n`;
-                    output += `📌 Étape 1 : Compréhension et Données\n`;
-                    output += `- Identification des paramètres et des expressions algébriques.\n`;
-                    output += `- Mise en place du domaine d'étude et des conditions initiales.\n\n`;
-                    output += `⚙️ Étape 2 : Développement et Calculs\n`;
-                    output += `- Application rigoureuse des théorèmes et des règles de calcul.\n`;
-                    output += `- Résolution étape par étape des équations ou des questions posées.\n\n`;
-                    output += `✅ Étape 3 : Conclusion et Résultat\n`;
-                    output += `Le résultat final est vérifié et validé conformément aux exigences de l'exercice.`;
-                    setSummary(output);
+                    setSummary(`📚 ${subject} - Résolution de l'Exercice\n\n📌 Analyse Initiale :\n- Examen des données et des contraintes du problème.\n\n💡 Étapes de Résolution :\n1. Identification des variables.\n2. Application des formules adéquates.\n\n🎯 Réponse Finale :\nL'exercice est résolu avec succès.`);
                 } else if (languageChoice === 'Arabic' || languageChoice === 'ar') {
-                    let output = `📚 ${subject} - الحل المفصل للتمرين\n\n`;
-                    output += `🔍 النص أو المسألة المحللة :\n« ${customText} »\n\n`;
-                    output += `📌 الخطوة 1 : تحليل المعطيات\n`;
-                    output += `- تحديد المتغيرات والشروط الأولية للمسألة.\n`;
-                    output += `- فهم المطلوب بدقة لاستخدام القانون الصحيح.\n\n`;
-                    output += `⚙️ الخطوة 2 : خطوات الحل والحساب\n`;
-                    output += `- تطبيق القوانين والنظريات الرياضية أو العلمية خطوة بخطوة.\n`;
-                    output += `- تبسيط المعادلات والوصول للنتائج الوسيطة.\n\n`;
-                    output += `✅ الخطوة 3 : النتيجة النهائية\n`;
-                    output += `تم التحقق من صحة الحل والنتيجة نهائياً وجاهزة للعرض.`;
-                    setSummary(output);
+                    setSummary(`📚 ${subject} - حل التمرين\n\n📌 تحليل المعطيات :\n- دراسة معطيات التمرين والمطلوب إثباته.\n\n💡 خطوات الحل :\n1. تحديد المتغيرات الأساسية.\n2. تطبيق القوانين المناسبة.\n\n🎯 الإجابة النهائية :\nتم حل المسألة بنجاح.`);
                 } else {
-                    let output = `📚 ${subject} - Detailed Exercise Solution\n\n`;
-                    output += `🔍 Analyzed Problem Statement :\n« ${customText} »\n\n`;
-                    output += `📌 Step 1 : Data Extraction\n`;
-                    output += `- Identifying given parameters, variables, and objectives.\n`;
-                    output += `- Establishing initial conditions and constraints.\n\n`;
-                    output += `⚙️ Step 2 : Mathematical / Scientific Execution\n`;
-                    output += `- Step-by-step application of governing formulas and theorems.\n`;
-                    output += `- Systematic calculation and algebraic manipulation.\n\n`;
-                    output += `✅ Step 3 : Final Verification\nThe solution has been thoroughly verified and completed.`;
-                    setSummary(output);
+                    setSummary(`📚 ${subject} - Exercise Solution\n\n📌 Problem Analysis :\n- Reviewing given parameters and objectives.\n\n💡 Solution Steps :\n1. Identifying key variables.\n2. Applying governing formulas.\n\n🎯 Final Answer :\nThe exercise has been successfully solved.`);
                 }
             };
 
             const handleOptionSelect = (optionId) => {
                 setSelectedOptionId(optionId);
-                let reply = "";
+                const subject = currentCatObj.nameEn;
+
                 if (explLang === 'French' || explLang === 'fr') {
-                    if (optionId === 1) reply = "🔍 Focus Formules : Rappel des théorèmes et propriétés algébriques utilisés.";
-                    else if (optionId === 2) reply = "⚡ Focus Étapes : Explication détaillée du raisonnement logique et des calculs.";
-                    else reply = "📝 Focus Pratique : Proposition d'un exercice d'application similaire.";
+                    if (optionId === 1) {
+                        setSummary(`🔍 ${subject} - Rappel des Formules :\n\n- Théorèmes et définitions fondamentaux applicables à cet exercice.\n- Propriétés algébriques et relations trigonométriques/scientifiques nécessaires.\n- Vérification de la validité des équations.`);
+                    } else if (optionId === 2) {
+                        setSummary(`⚡ ${subject} - Étapes Détaillées des Calculs :\n\n- Étape A : Isolation de la variable principale.\n- Étape B : Développement algébrique et simplification pas à pas.\n- Étape C : Calcul numérique final et encadrement du résultat.`);
+                    } else {
+                        setSummary(`📝 ${subject} - Exercice d'Entraînement Similaire :\n\n- Éنونçé Pratique : Appliquez la même méthode sur un cas pratique.\n- Indice : Utilisez les mêmes identités remarquables.\n- Solution attendue : Validez votre autonomie.`);
+                    }
                 } else if (explLang === 'Arabic' || explLang === 'ar') {
-                    if (optionId === 1) reply = "🔍 تركيز القوانين : مراجعة النظريات والقواعد المستخدمة في الحل.";
-                    else if (optionId === 2) reply = "⚡ تركيز الخطوات : شرح إضافي لخطوات التسطير والتبسيط الرياضي.";
-                    else reply = "📝 تركيز التدريب : طرح سؤال تدريبي مشابه لزيادة الاستيعاب.";
+                    if (optionId === 1) {
+                        setSummary(`🔍 ${subject} - مراجعة القوانين والنظريات :\n\n- استعراض القواعد الأساسية والنظريات المرتبطة بالسؤال.\n- شروط تطبيق كل قانون رياضي أو علمي.`);
+                    } else if (optionId === 2) {
+                        setSummary(`⚡ ${subject} - خطوات الحساب التفصيلية :\n\n- المرحلة الأولى : تبسيط المقادير الجبرية.\n- المرحلة الثانية : التعويض العددي المباشر.\n- المرحلة الثالثة : استخراج الناتج النهائي بالأخضر.`);
+                    } else {
+                        setSummary(`📝 ${subject} - تمرين تدريبي مشابه :\n\n- المسألة المقترحة لتثبيت الفهم.\n- جرب حلها بنفس الطريقة لضمان الاستيعاب التام.`);
+                    }
                 } else {
-                    if (optionId === 1) reply = "🔍 Formulas Focus: Reviewing core equations and mathematical properties.";
-                    else if (optionId === 2) reply = "⚡ Steps Focus: Extended breakdown of algebraic reasoning.";
-                    else reply = "📝 Practice Focus: Similar exercise generated for reinforcement.";
+                    if (optionId === 1) {
+                        setSummary(`🔍 ${subject} - Formulas & Rules Review :\n\n- Comprehensive breakdown of governing theorems and definitions.`);
+                    } else if (optionId === 2) {
+                        setSummary(`⚡ ${subject} - Detailed Calculation Walkthrough :\n\n- Systematic step-by-step algebraic reduction and computation.`);
+                    } else {
+                        setSummary(`📝 ${subject} - Practice Similar Problem :\n\n- Try solving a parallel exercise to test your understanding.`);
+                    }
                 }
-                setSummary(prev => prev + `\n\n--- \n✨ ${reply}`);
             };
 
             const handleSpeak = () => {
