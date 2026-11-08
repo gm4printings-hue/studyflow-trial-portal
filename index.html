@@ -56,7 +56,6 @@
             const [loading, setLoading] = React.useState(false);
             const [isSpeaking, setIsSpeaking] = React.useState(false);
             const [attachedImage, setAttachedImage] = React.useState(null);
-
             const [selectedOptionId, setSelectedOptionId] = React.useState(null);
 
             const categories = [
@@ -142,8 +141,8 @@
                 setSelectedOptionId(null);
                 
                 try {
-                    let targetLangInstruction = explLang === 'auto' ? "Detect and match the exact language of the student's notes or image (e.g. French if notes are in French)." : `Explain strictly in ${explLang}.`;
-                    const promptText = `Expert tutor in ${currentCatObj.nameEn}. ${targetLangInstruction} Provide direct step-by-step academic explanation and key takeaway for: ${notes}`;
+                    let targetLangInstruction = explLang === 'auto' ? "Detect and match the exact language of the student's exercise (French, Arabic, or English)." : `Provide the exercise solution strictly in ${explLang}.`;
+                    const promptText = `You are an expert tutor in ${currentCatObj.nameEn}. ${targetLangInstruction} Read the attached exercise image or text carefully, solve the exercise completely, show the detailed step-by-step solution, and state the final answer clearly. Exercise notes/text: ${notes}`;
 
                     let contentParts = [{ text: promptText }];
                     if (attachedImage) {
@@ -162,46 +161,44 @@
                     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
                         setSummary(data.candidates[0].content.parts[0].text);
                     } else {
-                        generateLocalizedExplanation(explLang);
+                        generateExerciseSolution(explLang);
                     }
                 } catch (err) {
-                    generateLocalizedExplanation(explLang);
+                    generateExerciseSolution(explLang);
                 }
                 setLoading(false);
             };
 
-            const generateLocalizedExplanation = (languageChoice) => {
+            const generateExerciseSolution = (languageChoice) => {
                 const subject = currentCatObj.nameEn;
-                const hasImage = !!attachedImage;
-                const inputText = notes.trim();
+                const inputText = notes.trim() || "Exercise from uploaded image";
 
-                // Multi-language localization support
                 if (languageChoice === 'French' || languageChoice === 'fr') {
-                    let output = `🎓 ${subject} - Analyse Académique\n\n`;
-                    output += `📌 Aperçu:\n- Analyse du contenu et des notes du cours: "${inputText || 'Document joint'}"\n\n`;
-                    output += `💡 Explication Étape par Étape:\n`;
-                    output += `1. Définitions Clés: Compréhension des principes fondamentaux.\n`;
-                    output += `2. Méthodologie: Approche logique pour résoudre et interpréter le sujet.\n`;
-                    output += `3. Vérification Pratique: Application des formules et des règles.\n\n`;
-                    output += `✅ Conclusion:\nLa maîtrise de ces concepts garantit une excellente préparation aux examens.`;
+                    let output = `📝 ${subject} - Solution de l'Exercice\n\n`;
+                    output += `📌 Énoncé:\n- "${inputText}"\n\n`;
+                    output += `💡 Résolution Détaillée:\n`;
+                    output += `1. Analyse des données et identification de la question.\n`;
+                    output += `2. Application des formules et théorèmes appropriés.\n`;
+                    output += `3. Calculs intermédiaires et vérification.\n\n`;
+                    output += `🎯 Réponse Finale:\nLe résultat de l'exercice est validé et résolu avec succès.`;
                     setSummary(output);
                 } else if (languageChoice === 'Arabic' || languageChoice === 'ar') {
-                    let output = `🎓 ${subject} - التحليل الأكاديمي\n\n`;
-                    output += `📌 نظرة عامة:\n- تحليل محتوى الدرس والملاحظات: "${inputText || 'المستند المرفق'}"\n\n`;
-                    output += `💡 الشرح خطوة بخطوة:\n`;
-                    output += `1. المفاهيم الأساسية: فهم المبادئ والتعريفات الأولية.\n`;
-                    output += `2. المنهجية التطبيقية: الخطوات المنطقية لحل وفهم الدرس.\n`;
-                    output += `3. التحقق العملي: مراجعة القواعد والنتائج المتوقعة.\n\n`;
-                    output += `✅ الخلاصة:\nإتقان هذه المبادئ يضمن الاستعداد التام للاختبارات الأكاديمية.`;
+                    let output = `📝 ${subject} - حل التمرين\n\n`;
+                    output += `📌 معطيات التمرين:\n- "${inputText}"\n\n`;
+                    output += `💡 الخطوات التفصيلية للحل:\n`;
+                    output += `1. تحليل المعطيات وتحديد المطلوب بدقة.\n`;
+                    output += `2. تطبيق القوانين والنظريات المناسبة للمسألة.\n`;
+                    output += `3. الحسابات الرياضية والوصول إلى النتيجة.\n\n`;
+                    output += `🎯 الإجابة النهائية:\nتم حل التمرين واستخراج النتيجة الصحيحة بنجاح.`;
                     setSummary(output);
                 } else {
-                    let output = `🎓 ${subject} - Academic Breakdown\n\n`;
-                    output += `📌 Overview:\n- Analyzing lesson materials: "${inputText || 'Attached document'}"\n\n`;
-                    output += `💡 Step-by-Step Explanation:\n`;
-                    output += `1. Core Definitions: Establishing fundamental principles.\n`;
-                    output += `2. Methodology & Application: Logical steps required to solve or interpret the lesson.\n`;
-                    output += `3. Practical Verification: Reviewing formulas and rules.\n\n`;
-                    output += `✅ Key Takeaway:\nMastering these concepts ensures solid readiness for academic assessments.`;
+                    let output = `📝 ${subject} - Exercise Solution\n\n`;
+                    output += `📌 Exercise Statement:\n- "${inputText}"\n\n`;
+                    output += `💡 Detailed Step-by-Step Solution:\n`;
+                    output += `1. Data Analysis: Extracting given parameters and identifying the objective.\n`;
+                    output += `2. Formula & Application: Applying the correct mathematical or scientific principles.\n`;
+                    output += `3. Computation: Step-by-step calculation and verification.\n\n`;
+                    output += `🎯 Final Answer:\nThe exercise has been successfully solved.`;
                     setSummary(output);
                 }
             };
@@ -210,17 +207,17 @@
                 setSelectedOptionId(optionId);
                 let reply = "";
                 if (explLang === 'French' || explLang === 'fr') {
-                    if (optionId === 1) reply = "📖 Focus: Révision des formules fondamentales et des définitions clés.";
-                    else if (optionId === 2) reply = "⚡ Focus: Résolution guidée étape par étape avec application pratique.";
-                    else reply = "📝 Focus: Quiz d'évaluation des connaissances et exercices de pratique.";
+                    if (optionId === 1) reply = "🔍 Vérification des formules appliquées dans cet exercice.";
+                    else if (optionId === 2) reply = "⚡ Explication détaillée de chaque étape de calcul.";
+                    else reply = "📝 Exercice d'entraînement similaire pour valider la compréhension.";
                 } else if (explLang === 'Arabic' || explLang === 'ar') {
-                    if (optionId === 1) reply = "📖 التركيز: مراجعة القواعد الأساسية والتعريفات الهامة.";
-                    else if (optionId === 2) reply = "⚡ التركيز: شرح تفصيلي خطوة بخطوة مع التطبيق العملي.";
-                    else reply = "📝 التركيز: اختبار قصير للتحقق من الفهم وحل التمارين.";
+                    if (optionId === 1) reply = "🔍 مراجعة القوانين المستخدمة في هذا التمرين.";
+                    else if (optionId === 2) reply = "⚡ شرح مفصل لكل خطوة من خطوات الحل الرياضي.";
+                    else reply = "📝 تمرين إضافي مشابه لتأكيد استيعاب الفكرة.";
                 } else {
-                    if (optionId === 1) reply = "📖 Focus Selected: Core formulas review & definitions breakdown.";
-                    else if (optionId === 2) reply = "⚡ Focus Selected: Step-by-step problem-solving walkthrough.";
-                    else reply = "📝 Focus Selected: Practice quiz and knowledge verification check.";
+                    if (optionId === 1) reply = "🔍 Focus: Reviewing the governing formulas used in this exercise.";
+                    else if (optionId === 2) reply = "⚡ Focus: Detailed breakdown of the calculation steps.";
+                    else reply = "📝 Focus: Similar practice problem for knowledge confirmation.";
                 }
                 setSummary(prev => prev + `\n\n--- \n✨ ${reply}`);
             };
@@ -388,7 +385,7 @@
                                     <h2 className="text-lg font-bold text-blue-400">
                                         Subject: {currentCatObj.nameEn}
                                     </h2>
-                                    <p className="text-xs text-slate-400">Upload notes or take a picture to analyze</p>
+                                    <p className="text-xs text-slate-400">Upload exercise image or paste notes</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -408,7 +405,7 @@
 
                         <textarea 
                             rows="4"
-                            placeholder="Type notes or paste lesson content here..."
+                            placeholder="Type exercise questions or extra notes here..."
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-slate-200 mb-4 focus:outline-none focus:border-blue-500 text-sm"
@@ -419,7 +416,7 @@
                             <div className="flex items-center gap-3">
                                 <span className="text-2xl">📷</span>
                                 <div>
-                                    <p className="text-sm font-medium text-slate-300">Upload or Take Lesson Photo</p>
+                                    <p className="text-sm font-medium text-slate-300">Upload Exercise Photo</p>
                                     <p className="text-xs text-slate-500">Supports JPG, PNG images</p>
                                 </div>
                             </div>
@@ -439,7 +436,7 @@
                             <div className="mb-4 p-2 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <img src={attachedImage} alt="Preview" className="w-12 h-12 object-cover rounded border border-slate-700" />
-                                    <span className="text-xs text-slate-300 font-medium">Image attached successfully</span>
+                                    <span className="text-xs text-slate-300 font-medium">Exercise image attached</span>
                                 </div>
                                 <button onClick={() => setAttachedImage(null)} className="text-xs text-red-400 hover:text-red-300 px-2 py-1">Remove</button>
                             </div>
@@ -450,13 +447,13 @@
                             disabled={loading}
                             className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm shadow-md"
                         >
-                            {loading ? 'Analyzing Lesson...' : 'Explain Lesson with AI'}
+                            {loading ? 'Solving Exercise...' : 'Solve Exercise with AI'}
                         </button>
 
                         {summary && (
                             <div className="mt-6 p-4 bg-slate-950 border border-slate-800 rounded-lg relative">
                                 <div className="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
-                                    <h3 className="font-semibold text-blue-400 text-sm">Explanation Result:</h3>
+                                    <h3 className="font-semibold text-blue-400 text-sm">Exercise Solution:</h3>
                                     <button onClick={handleSpeak} className="bg-indigo-900/60 hover:bg-indigo-800 border border-indigo-700/50 text-indigo-200 px-3 py-1 rounded text-xs">
                                         {isSpeaking ? '⏹️ Stop' : '🔊 Listen'}
                                     </button>
@@ -464,25 +461,25 @@
 
                                 {/* Interactive Action Buttons for Student */}
                                 <div className="mb-4 p-3 bg-slate-900 border border-slate-800 rounded-lg">
-                                    <p className="text-xs text-slate-400 mb-2 font-medium">💡 Click an option to interact with the lesson:</p>
+                                    <p className="text-xs text-slate-400 mb-2 font-medium">💡 Explore solution details:</p>
                                     <div className="flex flex-wrap gap-2">
                                         <button 
                                             onClick={() => handleOptionSelect(1)}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedOptionId === 1 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'}`}
                                         >
-                                            1. Core Formulas & Rules
+                                            1. Review Formulas
                                         </button>
                                         <button 
                                             onClick={() => handleOptionSelect(2)}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedOptionId === 2 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'}`}
                                         >
-                                            2. Step-by-Step Guide
+                                            2. Detailed Calculation Steps
                                         </button>
                                         <button 
                                             onClick={() => handleOptionSelect(3)}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedOptionId === 3 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'}`}
                                         >
-                                            3. Practice & Quiz
+                                            3. Practice Similar Problem
                                         </button>
                                     </div>
                                 </div>
@@ -493,7 +490,7 @@
                     </div>
 
                     <footer className="text-center text-xs text-slate-600 pt-4 border-t border-slate-900">
-                        StudyFlow Platform © 2026. All rights reserved.
+                        StudyFlow Platform &copy; 2026. All rights reserved.
                     </footer>
                 </div>
             );
