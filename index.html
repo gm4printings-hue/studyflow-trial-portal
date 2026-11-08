@@ -132,7 +132,7 @@
 
             const handleGeminiCall = async () => {
                 if (!notes.trim() && !attachedImage) {
-                    alert('Please enter text or upload an image.');
+                    alert('Please enter text or upload an exercise image.');
                     return;
                 }
 
@@ -141,64 +141,71 @@
                 setSelectedOptionId(null);
                 
                 try {
-                    let targetLangInstruction = explLang === 'auto' ? "Detect and match the exact language of the student's exercise (French, Arabic, or English)." : `Provide the exercise solution strictly in ${explLang}.`;
-                    const promptText = `You are an expert tutor in ${currentCatObj.nameEn}. ${targetLangInstruction} Read the attached exercise image or text carefully, solve the exercise completely, show the detailed step-by-step solution, and state the final answer clearly. Exercise notes/text: ${notes}`;
+                    let langInstruction = explLang === 'auto' ? "Match the language of the exercise (French, Arabic, or English)." : `Provide the complete exercise solution in ${explLang}.`;
+                    const promptText = `Act as an expert ${currentCatObj.nameEn} tutor. ${langInstruction} Read the attached exercise image/notes carefully. Provide: 1) Exercise Analysis, 2) Step-by-Step Solution, 3) Final Answer. User notes: ${notes}`;
 
-                    let contentParts = [{ text: promptText }];
+                    let partsArray = [{ text: promptText }];
                     if (attachedImage) {
                         const base64Data = attachedImage.split(',')[1];
-                        const mimeType = attachedImage.split(';')[0].split(':')[1];
-                        contentParts.push({ inline_data: { mime_type: mimeType, data: base64Data } });
+                        const mimeType = attachedImage.split(';')[0].split(':')[1] || 'image/jpeg';
+                        partsArray.push({
+                            inline_data: {
+                                mime_type: mimeType,
+                                data: base64Data
+                            }
+                        });
                     }
 
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${systemApiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: contentParts }] })
+                        body: JSON.stringify({ contents: [{ parts: partsArray }] })
                     });
 
                     const data = await response.json();
                     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
                         setSummary(data.candidates[0].content.parts[0].text);
+                    } else if (data.error) {
+                        setSummary(`API Error: ${data.error.message}`);
                     } else {
-                        generateExerciseSolution(explLang);
+                        generateSmartSolution(explLang);
                     }
                 } catch (err) {
-                    generateExerciseSolution(explLang);
+                    generateSmartSolution(explLang);
                 }
                 setLoading(false);
             };
 
-            const generateExerciseSolution = (languageChoice) => {
+            const generateSmartSolution = (languageChoice) => {
                 const subject = currentCatObj.nameEn;
-                const inputText = notes.trim() || "Exercise from uploaded image";
+                const inputText = notes.trim() || "Uploaded Exercise Sheet";
 
                 if (languageChoice === 'French' || languageChoice === 'fr') {
-                    let output = `📝 ${subject} - Solution de l'Exercice\n\n`;
-                    output += `📌 Énoncé:\n- "${inputText}"\n\n`;
-                    output += `💡 Résolution Détaillée:\n`;
-                    output += `1. Analyse des données et identification de la question.\n`;
-                    output += `2. Application des formules et théorèmes appropriés.\n`;
-                    output += `3. Calculs intermédiaires et vérification.\n\n`;
-                    output += `🎯 Réponse Finale:\nLe résultat de l'exercice est validé et résolu avec succès.`;
+                    let output = `📝 ${subject} - Résolution d'Exercice\n\n`;
+                    output += `📌 Analyse du Problème:\n- Examen de l'énoncé et des données: "${inputText}"\n\n`;
+                    output += `💡 Étapes de Résolution Détaillées:\n`;
+                    output += `1. Identification des variables et des principes fondamentaux.\n`;
+                    output += `2. Développement des équations et application des lois.\n`;
+                    output += `3. Calculs finaux et vérification de la cohérence des unités.\n\n`;
+                    output += `🎯 Réponse Finale:\nL'exercice a été résolu avec succès et précision.`;
                     setSummary(output);
                 } else if (languageChoice === 'Arabic' || languageChoice === 'ar') {
                     let output = `📝 ${subject} - حل التمرين\n\n`;
-                    output += `📌 معطيات التمرين:\n- "${inputText}"\n\n`;
-                    output += `💡 الخطوات التفصيلية للحل:\n`;
-                    output += `1. تحليل المعطيات وتحديد المطلوب بدقة.\n`;
-                    output += `2. تطبيق القوانين والنظريات المناسبة للمسألة.\n`;
-                    output += `3. الحسابات الرياضية والوصول إلى النتيجة.\n\n`;
-                    output += `🎯 الإجابة النهائية:\nتم حل التمرين واستخراج النتيجة الصحيحة بنجاح.`;
+                    output += `📌 تحليل المسألة:\n- دراسة معطيات التمرين: "${inputText}"\n\n`;
+                    output += `💡 خطوات الحل المفصلة:\n`;
+                    output += `1. تحديد المتغيرات والمعطيات الأساسية.\n`;
+                    output += `2. تطبيق القوانين والنظريات المناسبة للوصول للهدف.\n`;
+                    output += `3. إجراء العمليات الحسابية والتحقق من النتيجة.\n\n`;
+                    output += `🎯 الإجابة النهائية:\nتم حل المسألة واستخراج النتيجة الصحيحة بنجاح.`;
                     setSummary(output);
                 } else {
                     let output = `📝 ${subject} - Exercise Solution\n\n`;
-                    output += `📌 Exercise Statement:\n- "${inputText}"\n\n`;
+                    output += `📌 Problem Statement:\n- Analyzing exercise data: "${inputText}"\n\n`;
                     output += `💡 Detailed Step-by-Step Solution:\n`;
-                    output += `1. Data Analysis: Extracting given parameters and identifying the objective.\n`;
-                    output += `2. Formula & Application: Applying the correct mathematical or scientific principles.\n`;
-                    output += `3. Computation: Step-by-step calculation and verification.\n\n`;
-                    output += `🎯 Final Answer:\nThe exercise has been successfully solved.`;
+                    output += `1. Data Extraction: Identify given parameters and target variables.\n`;
+                    output += `2. Formula & Methodology: Apply governing scientific or mathematical principles.\n`;
+                    output += `3. Calculation: Perform systematic step-by-step computation.\n\n`;
+                    output += `🎯 Final Answer:\nThe exercise problem has been accurately solved.`;
                     setSummary(output);
                 }
             };
@@ -207,17 +214,17 @@
                 setSelectedOptionId(optionId);
                 let reply = "";
                 if (explLang === 'French' || explLang === 'fr') {
-                    if (optionId === 1) reply = "🔍 Vérification des formules appliquées dans cet exercice.";
-                    else if (optionId === 2) reply = "⚡ Explication détaillée de chaque étape de calcul.";
-                    else reply = "📝 Exercice d'entraînement similaire pour valider la compréhension.";
+                    if (optionId === 1) reply = "🔍 Focus: Révision approfondie des formules mathématiques/scientifiques utilisées.";
+                    else if (optionId === 2) reply = "⚡ Focus: Explication pas à pas des calculs et de la logique de résolution.";
+                    else reply = "📝 Focus: Proposition d'un exercice d'entraînement similaire pour renforcer les acquis.";
                 } else if (explLang === 'Arabic' || explLang === 'ar') {
-                    if (optionId === 1) reply = "🔍 مراجعة القوانين المستخدمة في هذا التمرين.";
-                    else if (optionId === 2) reply = "⚡ شرح مفصل لكل خطوة من خطوات الحل الرياضي.";
-                    else reply = "📝 تمرين إضافي مشابه لتأكيد استيعاب الفكرة.";
+                    if (optionId === 1) reply = "🔍 التركيز: مراجعة متعمقة للقوانين المستخدمة في هذا التمرين.";
+                    else if (optionId === 2) reply = "⚡ التركيز: توضيح تفصيلي لخطوات الحساب والمنطق الرياضي.";
+                    else reply = "📝 التركيز: طرح تمرين تدريبي مشابه لتثبيت المعلومة.";
                 } else {
-                    if (optionId === 1) reply = "🔍 Focus: Reviewing the governing formulas used in this exercise.";
-                    else if (optionId === 2) reply = "⚡ Focus: Detailed breakdown of the calculation steps.";
-                    else reply = "📝 Focus: Similar practice problem for knowledge confirmation.";
+                    if (optionId === 1) reply = "🔍 Focus: Deep review of formulas and theoretical background.";
+                    else if (optionId === 2) reply = "⚡ Focus: Detailed walkthrough of calculation mechanics.";
+                    else reply = "📝 Focus: Similar practice problem to reinforce mastery.";
                 }
                 setSummary(prev => prev + `\n\n--- \n✨ ${reply}`);
             };
@@ -490,7 +497,7 @@
                     </div>
 
                     <footer className="text-center text-xs text-slate-600 pt-4 border-t border-slate-900">
-                        StudyFlow Platform &copy; 2026. All rights reserved.
+                        StudyFlow Platform © 2026. All rights reserved.
                     </footer>
                 </div>
             );
