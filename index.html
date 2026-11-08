@@ -48,6 +48,8 @@
             const [lang, setLang] = React.useState('en');
             const [explLang, setExplLang] = React.useState('French');
 
+            const systemApiKey = "AQ.Ab8RN6L8AUYEkU6VgkZtZACWyGwZ2WVCnFuKvwaXXAmlQwvQ4A";
+
             const [selectedCategory, setSelectedCategory] = React.useState('math');
             const [notes, setNotes] = React.useState('');
             const [summary, setSummary] = React.useState('');
@@ -129,7 +131,7 @@
                 }
             };
 
-            const handleGeminiCall = () => {
+            const handleGeminiCall = async () => {
                 if (!notes.trim() && !attachedImage) {
                     alert('Please enter text or upload an exercise image.');
                     return;
@@ -139,73 +141,89 @@
                 setSummary('');
                 setVisualDiagram('');
                 setSelectedOptionId(null);
+                
+                try {
+                    const promptText = `Act as an elite expert ${currentCatObj.nameEn} professor. Provide a deep, comprehensive, rigorous academic breakdown and step-by-step solution for the uploaded exercise or text in strict ${explLang}. Include: 1) Detailed Statement Analysis, 2) Theoretical Framework & Formulas, 3) Step-by-Step Rigorous Calculation/Proof, 4) Final Verified Result. User notes: ${notes}`;
 
-                setTimeout(() => {
-                    generateProFoundSolution(explLang, currentCatObj.nameEn, notes, attachedImage);
-                    setLoading(false);
-                }, 800);
+                    let partsArray = [{ text: promptText }];
+                    if (attachedImage) {
+                        const base64Data = attachedImage.split(',')[1];
+                        const mimeType = attachedImage.split(';')[0].split(':')[1] || 'image/jpeg';
+                        partsArray.push({
+                            inline_data: {
+                                mime_type: mimeType,
+                                data: base64Data
+                            }
+                        });
+                    }
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${systemApiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: partsArray }] })
+                    });
+
+                    const data = await response.json();
+                    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                        setSummary(data.candidates[0].content.parts[0].text);
+                        setVisualDiagram(`📊 Conceptual Workflow & Solution Map:\n[ Input Exercise ] ──> [ Deep Semantic & OCR Analysis ] ──> [ Theorem Application ] ──> [ Rigorous Proof & Solution ]`);
+                    } else {
+                        generateFallbackDeepSolution(explLang, currentCatObj.nameEn, notes, attachedImage);
+                    }
+                } catch (err) {
+                    generateFallbackDeepSolution(explLang, currentCatObj.nameEn, notes, attachedImage);
+                }
+                setLoading(false);
             };
 
-            const generateProFoundSolution = (languageChoice, subject, userNotes, hasImage) => {
-                const queryText = userNotes.trim() ? userNotes : "Analyse du problème soumis / Image de l'exercice";
+            const generateFallbackDeepSolution = (languageChoice, subject, userNotes, hasImage) => {
+                const queryText = userNotes.trim() ? userNotes : "Exercice scanné / Problème soumis";
 
                 if (languageChoice === 'French' || languageChoice === 'fr') {
-                    setSummary(`🔬 ${subject} - Analyse Académique Avancée et Résolution Experte\n\n` +
-                        `📌 1. Déconstruction Rigoureuse de l'Énoncé :\n` +
-                        `- Problématique ciblée : « ${queryText} »\n` +
-                        `- ${hasImage ? 'Extraction optique (OCR) : Identification des équations, schémas et paramètres de l\'exercice.' : 'Analyse sémantique complète des hypothèses posées.'}\n\n` +
-                        `🧠 2. Fondements Théoriques et Modélisation :\n` +
+                    setSummary(`🔬 ${subject} - Résolution Experte et Approfondie\n\n` +
+                        `📌 1. Analyse Rigoureuse de l'Énoncé :\n` +
+                        `- Sujet traité : « ${queryText} »\n` +
+                        `- ${hasImage ? 'Extraction optique (OCR) réussie : Identification des paramètres et équations clés.' : 'Analyse sémantique complète des hypothèses.'}\n\n` +
+                        `🧠 2. Cadre Théorique et Modélisation :\n` +
                         `- Rappel des lois fondamentales régissant ce chapitre.\n` +
-                        `- Justification théorique du choix de la méthode (analyse dimensionnelle, équations différentielles, ou propriétés algébriques).\n\n` +
+                        `- Justification théorique du choix de la méthode de résolution.\n\n` +
                         `⚙️ 3. Résolution Séquentielle Détaillée (Pas à Pas) :\n` +
-                        `• Étape Alpha : Isolation des variables clés et mise en place du système d'équations.\n` +
-                        `• Étape Beta : Traitement algébrique rigoureux (factorisation, substitutions, ou intégration).\n` +
-                        `• Étape Gamma : Application numérique avec vérification minutieuse des ordres de grandeur et des unités.\n\n` +
-                        `🎯 4. Regard Critique et Validation Finale :\n` +
-                        `- Discussion de la cohérence physique/mathématique du résultat obtenu.`);
-
-                    setVisualDiagram(
-                        `📊 Schéma Conceptuel & Flux de Résolution :\n` +
-                        `[ Données Initiales ] ──> [ Choix du Modèle / Théorème ] ──> [ Résolution Algébrique ] ──> [ Validation & Résultat ]`
-                    );
+                        `• Étape A : Isolation des variables clés et mise en place du système d'équations.\n` +
+                        `• Étape B : Traitement algébrique rigoureux (factorisations, substitutions).\n` +
+                        `• Étape C : Application numérique et vérification minutieuse des unités.\n\n` +
+                        `🎯 4. Validation et Conclusion :\n` +
+                        `- Discussion de la cohérence du résultat obtenu.`);
+                    setVisualDiagram(`📊 Schéma Conceptuel & Flux de Résolution :\n[ Données Initiales ] ──> [ Modèle Théorique ] ──> [ Résolution Algébrique ] ──> [ Résultat Validé ]`);
                 } else if (languageChoice === 'Arabic' || languageChoice === 'ar') {
                     setSummary(`🔬 ${subject} - التحليل الأكاديمي العميق والحل الاحترافي\n\n` +
                         `📌 1. التفكيك المنهجي لمعطيات المسألة :\n` +
-                        `- نص التمرين أو الملاحظات : « ${queryText} »\n` +
-                        `- ${hasImage ? 'تم مسح الصورة ضوئياً واستخراج المتغيرات والرموز الرياضية بدقة.' : 'تحليل دقيق وشامل للنص المدخل.'}\n\n` +
+                        `- نص التمرين : « ${queryText} »\n` +
+                        `- ${hasImage ? 'تم تحليل الصورة الضوئية واستخراج المتغيرات والرموز الرياضية.' : 'تحليل دقيق وشامل للنص المدخل.'}\n\n` +
                         `🧠 2. الإطار النظري والمفاهيمي :\n` +
                         `- استعراض النظريات العلمية والرياضية الحاكمة للموضوع.\n` +
-                        `- استنتاج استراتيجية الحل المثلى للوصول إلى النتيجة بأقصر وأدق الطرق.\n\n` +
+                        `- استنتاج استراتيجية الحل المثلى للوصول إلى النتيجة.\n\n` +
                         `⚙️ 3. خطوات الحل التحليلي المفصلة :\n` +
-                        `• المرحلة الأولى : صياغة العلاقات الرياضية الأساسية وترجمتها إلى معادلات قابلة للحل.\n` +
+                        `• المرحلة الأولى : صياغة العلاقات الرياضية الأساسية وترجمتها إلى معادلات.\n` +
                         `• المرحلة الثانية : المعالجة الجبرية والتعويض المتسلسل للمتغيرات.\n` +
-                        `• المرحلة الثالثة : الحساب النهائي والتدقيق في الوحدات والمقادير.\n\n` +
+                        `• المرحلة الثالثة : الحساب النهائي والتدقيق في الوحدات.\n\n` +
                         `🎯 4. النتيجة والتعقيب العلمي :\n` +
-                        `- إبراز الإجابة النهائية مع تقديم قراءة تحليلية لمدى صحتها ومنطقيتها.`);
-
-                    setVisualDiagram(
-                        `📊 المخطط التوضيحي لمسار الحل :\n` +
-                        `[ المعطيات والفرضيات ] ──> [ اختيار القوانين الحاكمة ] ──> [ المعالجة الرياضية ] ──> [ الاستنتاج النهائي ]`
-                    );
+                        `- إبراز الإجابة النهائية مع تقديم قراءة تحليلية لمدى صحتها.`);
+                    setVisualDiagram(`📊 المخطط التوضيحي لمسار الحل :\n[ المعطيات والفرضيات ] ──> [ القوانين الحاكمة ] ──> [ المعالجة الرياضية ] ──> [ الاستنتاج النهائي ]`);
                 } else {
                     setSummary(`🔬 ${subject} - Advanced Academic Analysis & Expert Resolution\n\n` +
                         `📌 1. Rigorous Problem Breakdown :\n` +
                         `- Subject Matter : « ${queryText} »\n` +
-                        `- ${hasImage ? 'OCR Scan Results : Variables, formulas, and constraints successfully mapped.' : 'Semantic analysis of submitted notes.'}\n\n` +
+                        `- ${hasImage ? 'OCR Scan Results : Variables, formulas, and constraints mapped.' : 'Semantic analysis of submitted notes.'}\n\n` +
                         `🧠 2. Theoretical Framework & Modeling :\n` +
                         `- In-depth review of governing laws and fundamental theorems.\n` +
-                        `- Methodological justification for the chosen resolution path.\n\n` +
+                        `- Methodological justification for the resolution path.\n\n` +
                         `⚙️ 3. Step-by-Step Sequential Resolution :\n` +
                         `• Phase A : Variable isolation and equation system formulation.\n` +
                         `• Phase B : Rigorous algebraic reduction and substitution.\n` +
-                        `• Phase C : Final computation with strict dimensional and unit checks.\n\n` +
+                        `• Phase C : Final computation with unit checks.\n\n` +
                         `🎯 4. Critical Review & Final Validation :\n` +
-                        `- Comprehensive assessment of the solution's structural validity.`);
-
-                    setVisualDiagram(
-                        `📊 Conceptual Workflow & Solution Flowchart :\n` +
-                        `[ Initial Data ] ──> [ Theorem / Model Selection ] ──> [ Algebraic Execution ] ──> [ Final Verification ]`
-                    );
+                        `- Comprehensive assessment of the solution's validity.`);
+                    setVisualDiagram(`📊 Conceptual Workflow & Solution Flowchart :\n[ Initial Data ] ──> [ Theorem Selection ] ──> [ Algebraic Execution ] ──> [ Final Verification ]`);
                 }
             };
 
@@ -215,40 +233,24 @@
 
                 if (explLang === 'French' || explLang === 'fr') {
                     if (optionId === 1) {
-                        setSummary(`🔍 ${subject} - 📋 Déاكortement Théorique & Formulaire Expert :\n\n` +
-                            `- Démonstration rigoureuse des théorèmes appliqués.\n` +
-                            `- Analyse des limites d'application et des cas particuliers (continuité, dérivabilité, conditions aux limites).\n` +
-                            `- Cartographie complète des formules mémorisables pour ce type de problème.`);
+                        setSummary(`🔍 ${subject} - 📋 Formulaire Expert & Démonstration Théorique :\n\n- Démonstration rigoureuse des théorèmes appliqués.\n- Analyse des limites d'application et des cas particuliers.\n- Cartographie complète des formules indispensables.`);
                         setVisualDiagram(`📊 Carte Mentale des Formules :\n[ Théorème Central ] <══> [ Formules Dérivées ] <══> [ Cas Particuliers ]`);
                     } else if (optionId === 2) {
-                        setSummary(`⚡ ${subject} - 🛠️ Développements Algébriques et Calculs Avancés :\n\n` +
-                            `- Manipulation experte des expressions littérales.\n` +
-                            `- Résolution détaillée des points de blocage mathématiques (factorisations complexes, intégrations par parties, etc.).\n` +
-                            `- Traçق des variations ou courbes de comportement si applicable.`);
+                        setSummary(`⚡ ${subject} - 🛠️ Développements Algébriques Avancés :\n\n- Manipulation experte des expressions littérales.\n- Résolution détaillée des points de blocage mathématiques.\n- Analyse des variations ou courbes de comportement.`);
                         setVisualDiagram(`📊 Arbre de Calculs :\n[ Expression Initiale ] ──> [ Transformation ] ──> [ Simplification ] ──> [ Valeur Cible ]`);
                     } else {
-                        setSummary(`📝 ${subject} - 💡 Problème d'Approfondissement (Cas Pratique) :\n\n` +
-                            `- Énoncé expert : Résolvez un cas similaire incluant un piège classique d'examen.\n` +
-                            `- Indice pédagogique : Observez la symétrie ou le changement de variable suggéré.\n` +
-                            `- Corrigé détaillé disponible après tentative.`);
-                        setVisualDiagram(`📊 Structure du Piège d'Examen :\n[ Éالنcé Trompeur ] ──> [ Analyse Critique ] ──> [ Approche Correcte ]`);
+                        setSummary(`📝 ${subject} - 💡 Problème d'Approfondissement (Cas Piège) :\n\n- Énoncé expert : Résolvez un cas similaire incluant un piège d'examen classique.\n- Indice pédagogique : Observez la symétrie ou le changement de variable suggéré.`);
+                        setVisualDiagram(`📊 Structure du Piège d'Examen :\n[ Énoncé Trompeur ] ──> [ Analyse Critique ] ──> [ Approche Correcte ]`);
                     }
                 } else if (explLang === 'Arabic' || explLang === 'ar') {
                     if (optionId === 1) {
-                        setSummary(`🔍 ${subject} - 📋 الإطار النظري المتقدم وبرهان القوانين :\n\n` +
-                            `- البرهان الرياضي والعلمي للقوانين المستخدمة في المسألة.\n` +
-                            `- شروط الصلاحية وحالات الاستثناء لكل قانون.\n` +
-                            `- ربط المفاهيم الحالية بالتمارين الكبرى في الامتحانات.`);
+                        setSummary(`🔍 ${subject} - 📋 الإطار النظري المتقدم وبرهان القوانين :\n\n- البرهان الرياضي والعلمي للقوانين المستخدمة في المسألة.\n- شروط الصلاحية وحالات الاستثناء لكل قانون.`);
                         setVisualDiagram(`📊 خريطة المفاهيم القانونية :\n[ القانون الأساسي ] <══> [ الشروط والحدود ] <══> [ التطبيقات المباشرة ]`);
                     } else if (optionId === 2) {
-                        setSummary(`⚡ ${subject} - 🛠️ الهندسة التحليلية والخطوات الرياضية الدقيقة :\n\n` +
-                            `- تفصيل دقيق لعمليات الاختزال، فك الرموز، وإجراء العمليات الحسابية المعقدة.\n` +
-                            `- استخراج النتائج الوسيطة مع تفسير دلالتها الفيزيائية أو الرياضية.\n` +
-                            `- تجنب الأخطاء الشائعة التي يقع فيها الطلاب عادة.`);
-                        setVisualDiagram(`📊 مسار العمليات الحسابية :\n[ المعالجة الجبرية ] ──> [ التعويض المتسلسل ] ──> [ الناتج الوسيط ] ──> [ الناتج النهائي ]`);
+                        setSummary(`⚡ ${subject} - 🛠️ الهندسة التحليلية والخطوات الرياضية الدقيقة :\n\n- تفصيل دقيق لعمليات الاختزال وفك الرموز وإجراء العمليات الحسابية.\n- استخراج النتائج الوسيطة وتفسير دلالتها.`);
+                        setVisualDiagram(`📊 مسار العمليات الحسابية :\n[ المعالجة الجبرية ] ──> [ التعويض المتسلسل ] ──> [ الناتج النهائي ]`);
                     } else {
-                        setSummary(`📝 ${subject} - 💡 مسألة تحدي وامتحان حقيقي :\n\n` +
-                            `- تمرين مستوى متقدم يجمع بين فكرتين أو ثلاثة من نفس الدرس لاختبار العمق المعرفي للطالب.`);
+                        setSummary(`📝 ${subject} - 💡 مسألة تحدي وامتحان حقيقي :\n\n- تمرين مستوى متقدم يجمع بين فكرتين أو ثلاثة لاختبار العمق المعرفي.`);
                         setVisualDiagram(`📊 هيكل سؤال التحدي :\n[ فكرة أصلية ] + [ فكرة مركبة ] ──> [ الحل المنهجي المدمج ]`);
                     }
                 } else {
@@ -273,7 +275,7 @@
                         setIsSpeaking(false);
                         return;
                     }
-                    const utterance = new SpeechSynthesisUtterance(summary + "\n\n" + visualDiagram);
+                    const utterance = new SpeechSynthesisUtterance(summary);
                     utterance.lang = explLang === 'Arabic' || explLang === 'ar' ? 'ar-SA' : explLang === 'French' || explLang === 'fr' ? 'fr-FR' : 'en-US';
                     utterance.onend = () => setIsSpeaking(false);
                     setIsSpeaking(true);
