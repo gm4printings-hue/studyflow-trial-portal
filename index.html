@@ -48,8 +48,8 @@
             const [lang, setLang] = React.useState('en');
             const [explLang, setExplLang] = React.useState('auto');
 
-            // System Gemini API Key Configured
-            const systemApiKey = "AQ.Ab8RN6KP75gDc2-LPeQGrjy8bVXVOPsEI2bs6qgiv3DVopP-7w";
+            // ⚠️ ضع مفتاح Gemini API الصحيح هنا (يبدأ بـ AIzaSy...)
+            const systemApiKey = "AIzaSy_YOUR_VALID_API_KEY_HERE";
 
             const [selectedCategory, setSelectedCategory] = React.useState('math');
             const [notes, setNotes] = React.useState('');
@@ -149,8 +149,7 @@
                         contentParts.push({ inline_data: { mime_type: mimeType, data: base64Data } });
                     }
 
-                    // Using gemini-pro which is universally supported across all standard keys
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${systemApiKey}`, {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${systemApiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: contentParts }] })
