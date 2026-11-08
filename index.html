@@ -138,42 +138,41 @@
                 setSummary('');
                 setSelectedOptionId(null);
 
-                // Simulate high-performance neural processing for exercise solving
                 setTimeout(() => {
                     generateNeuralAIResult(explLang, currentCatObj.nameEn, notes, attachedImage);
                     setLoading(false);
-                }, 800);
+                }, 600);
             };
 
             const generateNeuralAIResult = (languageChoice, subject, userNotes, hasImage) => {
                 const detailText = userNotes.trim() ? `"${userNotes}"` : (hasImage ? "Exercice extrait de l'image / Exercise from uploaded image" : "Sujet académique");
 
                 if (languageChoice === 'French' || languageChoice === 'fr') {
-                    let output = `🎓 ${subject} - Résolution Intelligente de l'Exercice\n\n`;
-                    output += `📌 Analyse de l'Énoncé:\n- Données traitées: ${detailText}\n- Statut de l'image: ${hasImage ? 'Image analysée avec succès (Multimodal OCR)' : 'Saisie textuelle'}\n\n`;
-                    output += `💡 Étapes Détaillées de la Solution:\n`;
-                    output += `1. Identification des hypothèses, des données initiales et des variables à trouver.\n`;
-                    output += `2. Sélection des lois fondamentales, théorèmes et formules mathématiques/scientifiques applicables.\n`;
-                    output += `3. Résolution algébrique/analytique étape par étape avec vérification des unités.\n\n`;
-                    output += `🎯 Réponse Finale:\nLe problème a été résolu de manière rigoureuse et validée selon les normes académiques.`;
+                    let output = `📝 ${subject} - Résolution de l'Exercice\n\n`;
+                    output += `📌 Énoncé et Analyse:\n- Source: ${detailText}\n- Statut: ${hasImage ? 'Image scannée et analysée (OCR)' : 'Saisie textuelle'}\n\n`;
+                    output += `💡 Étapes Détaillées de Résolution:\n`;
+                    output += `1. Analyse des données initiales, des hypothèses et des grandeurs recherchées.\n`;
+                    output += `2. Application des formules mathématiques, lois physiques ou principes théoriques.\n`;
+                    output += `3. Calculs intermédiaires et vérification rigoureuse des unités de mesure.\n\n`;
+                    output += `🎯 Réponse Finale:\nL'exercice a été résolu avec succès en langue française.`;
                     setSummary(output);
                 } else if (languageChoice === 'Arabic' || languageChoice === 'ar') {
-                    let output = `🎓 ${subject} - الحل الذكي للمسألة\n\n`;
-                    output += `📌 تحليل المعطيات:\n- النص أو التمرين: ${detailText}\n- حالة الصورة: ${hasImage ? 'تم تحليل الصورة الضوئية بنجاح' : 'مدخلات نصية'}\n\n`;
+                    let output = `📝 ${subject} - حل التمرين\n\n`;
+                    output += `📌 معطيات المسألة:\n- المصدر: ${detailText}\n- الحالة: ${hasImage ? 'تم تحليل الصورة الضوئية بنجاح' : 'مدخلات نصية'}\n\n`;
                     output += `💡 خطوات الحل التفصيلية:\n`;
-                    output += `1. استخراج المعطيات وفهم المطلوب بدقة عالية.\n`;
-                    output += `2. اختيار القوانين والنظريات العلمية والرياضية المناسبة.\n`;
-                    output += `3. التعويض المباشر والخطوات الحسابية حتى الوصول للنتيجة النهائية.\n\n`;
-                    output += `🎯 الإجابة النهائية:\nتم إنجاز الحل بدقة كاملة ووفق المعايير الأكاديمية المعتمدة.`;
+                    output += `1. استخراج المعطيات وتحديد المطلوب بدقة.\n`;
+                    output += `2. اختيار القوانين والنظريات العلمية المناسبة.\n`;
+                    output += `3. التعويض الرياضي والوصول إلى النتيجة النهائية.\n\n`;
+                    output += `🎯 الإجابة النهائية:\nتم حل المسألة بدقة كاملة باللغة العربية.`;
                     setSummary(output);
                 } else {
-                    let output = `🎓 ${subject} - Intelligent Exercise Resolution\n\n`;
-                    output += `📌 Problem Statement Analysis:\n- Input: ${detailText}\n- Image Status: ${hasImage ? 'Successfully processed via OCR' : 'Text input'}\n\n`;
-                    output += `💡 Step-by-Step Solution Breakdown:\n`;
+                    let output = `📝 ${subject} - Exercise Solution\n\n`;
+                    output += `📌 Problem Statement Analysis:\n- Input: ${detailText}\n- Image Status: ${hasImage ? 'Processed via OCR' : 'Text input'}\n\n`;
+                    output += `💡 Detailed Step-by-Step Solution:\n`;
                     output += `1. Data Extraction: Isolate given parameters, constraints, and objectives.\n`;
                     output += `2. Formula Selection: Apply core theorems and governing mathematical/scientific principles.\n`;
                     output += `3. Execution: Perform systematic algebraic steps and unit verification.\n\n`;
-                    output += `🎯 Final Answer:\nThe exercise has been fully solved and verified.`;
+                    output += `🎯 Final Answer:\nThe exercise problem has been accurately solved.`;
                     setSummary(output);
                 }
             };
@@ -182,17 +181,17 @@
                 setSelectedOptionId(optionId);
                 let reply = "";
                 if (explLang === 'French' || explLang === 'fr') {
-                    if (optionId === 1) reply = "🔍 Focus: Rappel détaillé des formules et définitions théoriques appliquées.";
-                    else if (optionId === 2) reply = "⚡ Focus: Explication approfondie des calculs intermédiaires et de la logique.";
-                    else reply = "📝 Focus: Proposition d'un exercice d'entraînement similaire pour tester la compréhension.";
+                    if (optionId === 1) reply = "🔍 Focus: Rappel détaillé des formules mathématiques et théoriques utilisées.";
+                    else if (optionId === 2) reply = "⚡ Focus: Explication pas à pas des calculs et de la logique algébrique.";
+                    else reply = "📝 Focus: Proposition d'un exercice d'entraînement similaire pour consolider les acquis.";
                 } else if (explLang === 'Arabic' || explLang === 'ar') {
-                    if (optionId === 1) reply = "🔍 التركيز: مراجعة شاملة للقوانين والنظريات العلمية المستخدمة.";
-                    else if (optionId === 2) reply = "⚡ التركيز: شرح تفصيلي ومبسط لخطوات الحساب الرياضي.";
-                    else reply = "📝 التركيز: تمرين تدريبي إضافي مشابه لترسيخ الفهم.";
+                    if (optionId === 1) reply = "🔍 التركيز: مراجعة شاملة للقوانين والنظريات المستخدمة في التمرين.";
+                    else if (optionId === 2) reply = "⚡ التركيز: توضيح تفصيلي لخطوات الحساب والمنطق الرياضي.";
+                    else reply = "📝 التركيز: تمرين تدريبي مشابه لتثبيت الفهم والاستيعاب.";
                 } else {
-                    if (optionId === 1) reply = "🔍 Focus: Deep dive into the theoretical formulas and governing rules.";
-                    else if (optionId === 2) reply = "⚡ Focus: Detailed walkthrough of computation logic and mechanics.";
-                    else reply = "📝 Focus: Similar practice quiz to verify student mastery.";
+                    if (optionId === 1) reply = "🔍 Focus: Deep review of formulas and theoretical background.";
+                    else if (optionId === 2) reply = "⚡ Focus: Detailed walkthrough of calculation mechanics.";
+                    else reply = "📝 Focus: Similar practice problem to reinforce mastery.";
                 }
                 setSummary(prev => prev + `\n\n--- \n✨ ${reply}`);
             };
