@@ -34,7 +34,6 @@
                 ];
             });
 
-            // Force clear old session to show login gate correctly
             const [currentUser, setCurrentUser] = React.useState(null);
             const [isRegistering, setIsRegistering] = React.useState(false);
             const [loginInput, setLoginInput] = React.useState('');
@@ -45,9 +44,8 @@
             const [lang, setLang] = React.useState('en');
             const [explLang, setExplLang] = React.useState('auto');
 
-            // Hardcoded System Gemini API Key (Hidden from students completely)
-            // You can replace this string with your actual Gemini API key so students don't need to enter anything!
-            const systemApiKey = localStorage.getItem('gemini_api_key') || "YOUR_GEMINI_API_KEY_HERE";
+            // ⚠️ PLACE YOUR ACTUAL GEMINI API KEY INSIDE THE QUOTES BELOW:
+            const systemApiKey = "YOUR_GEMINI_API_KEY_HERE";
 
             const [selectedCategory, setSelectedCategory] = React.useState('math');
             const [notes, setNotes] = React.useState('');
@@ -122,6 +120,10 @@
             };
 
             const handleGeminiCall = async () => {
+                if (systemApiKey === "YOUR_GEMINI_API_KEY_HERE" || !systemApiKey) {
+                    alert('System Error: Gemini API Key is missing in the code configuration.');
+                    return;
+                }
                 if (!notes.trim() && !attachedImage) {
                     alert('Please enter text or upload an image.');
                     return;
@@ -149,8 +151,10 @@
                     const data = await response.json();
                     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
                         setSummary(data.candidates[0].content.parts[0].text);
+                    } else if (data.error) {
+                        setSummary(`API Error: ${data.error.message}`);
                     } else {
-                        setSummary('No response generated. Please check system configuration.');
+                        setSummary('No response generated. Please check API key.');
                     }
                 } catch (err) {
                     setSummary('Connection error.');
@@ -246,7 +250,7 @@
                 );
             }
 
-            // APP DASHBOARD (API Key fully hidden)
+            // APP DASHBOARD
             return (
                 <div className="max-w-5xl mx-auto p-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
                     <header className="flex flex-col md:flex-row justify-between items-center py-4 border-b border-slate-800 mb-6 gap-4">
