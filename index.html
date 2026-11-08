@@ -45,6 +45,8 @@
                 { id: 'langs', nameEn: 'Languages', nameFr: 'Langues', nameAr: 'اللغات', icon: '📖', stem: false }
             ];
 
+            const currentCatObj = categories.find(c => c.id === selectedCategory) || categories[0];
+
             const handleSaveKey = (e) => {
                 e.preventDefault();
                 localStorage.setItem('gemini_api_key', apiKey);
@@ -75,9 +77,6 @@
                 setLoading(true);
                 setSummary('');
                 try {
-                    const currentCat = categories.find(c => c.id === selectedCategory);
-                    
-                    // Determine explanation language logic
                     let targetLangInstruction = "";
                     if (explLang === 'auto') {
                         targetLangInstruction = "Match the exact language of the provided study material or notes (If French, explain in French; if Arabic, explain in Arabic; if English, explain in English).";
@@ -89,7 +88,7 @@
                         targetLangInstruction = "Explain strictly in Arabic (باللغة العربية).";
                     }
 
-                    const promptText = `You are an expert tutor for the subject: ${currentCat ? currentCat.nameEn : 'General'}. ${targetLangInstruction} Provide a clear, highly structured explanation, step-by-step breakdown, and key takeaway points. Study Material / Notes:\n\n${notes}`;
+                    const promptText = `You are an expert tutor specializing in ${currentCatObj.nameEn}. ${targetLangInstruction} Provide a clear, highly structured explanation, step-by-step breakdown, and key takeaway points. Study Material / Notes:\n\n${notes}`;
 
                     let contentParts = [{ text: promptText }];
 
@@ -185,14 +184,14 @@
                     {/* Study Categories Grid */}
                     <div className="mb-8">
                         <h2 className="text-lg font-bold mb-4 text-slate-200">
-                            {lang === 'ar' ? 'تصنيفات المواد الدراسية' : lang === 'fr' ? 'Catégories d\'études' : 'Study Categories'}
+                            {lang === 'ar' ? 'اختر المادة الدراسية' : lang === 'fr' ? 'Choisissez la matière' : 'Select Study Subject'}
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {categories.map((cat) => (
                                 <div 
                                     key={cat.id} 
                                     onClick={() => setSelectedCategory(cat.id)}
-                                    className={`p-4 rounded-xl border cursor-pointer transition-all bg-slate-900 hover:border-blue-500 ${selectedCategory === cat.id ? 'border-blue-500 bg-slate-800 ring-2 ring-blue-500/30' : 'border-slate-800'}`}
+                                    className={`p-4 rounded-xl border cursor-pointer transition-all bg-slate-900 hover:border-blue-500 ${selectedCategory === cat.id ? 'border-blue-500 bg-slate-800 ring-2 ring-blue-500/30 scale-[1.02]' : 'border-slate-800'}`}
                                 >
                                     <div className="text-3xl mb-2">{cat.icon}</div>
                                     <h3 className="font-semibold text-sm">
@@ -200,8 +199,8 @@
                                     </h3>
                                     <p className="text-xs text-slate-500 mt-1">
                                         {cat.stem 
-                                            ? (lang === 'ar' ? 'وسائط غنية + شرح معمق' : lang === 'fr' ? 'Médias riches + Explication' : 'Rich Media + Deep Explanations') 
-                                            : (lang === 'ar' ? 'صور + ملخصات نصية' : lang === 'fr' ? 'Images + Textes' : 'Images + Text Summaries')
+                                            ? (lang === 'ar' ? 'شرح معمق + وسائط' : lang === 'fr' ? 'Explication + Médias' : 'Deep Explanations') 
+                                            : (lang === 'ar' ? 'ملخصات نصية + صور' : lang === 'fr' ? 'Textes + Images' : 'Text Summaries')
                                         }
                                     </p>
                                 </div>
@@ -209,22 +208,30 @@
                         </div>
                     </div>
 
-                    {/* AI Lesson Explainer Card */}
-                    <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg mb-8">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                            <h2 className="text-lg font-bold">
-                                {lang === 'ar' ? 'مساعد شرح وتلخيص الدروس' : lang === 'fr' ? 'Assistant de cours IA' : 'AI Lesson Explainer'}
-                            </h2>
+                    {/* Active Subject Workspace (AI Lesson Explainer Card) */}
+                    <div className="bg-slate-900 p-6 rounded-xl border border-blue-500/50 shadow-xl mb-8">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 border-b border-slate-800 pb-3">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">{currentCatObj.icon}</span>
+                                <div>
+                                    <h2 className="text-lg font-bold text-blue-400">
+                                        {lang === 'ar' ? `مادة: ${currentCatObj.nameAr}` : lang === 'fr' ? `Matière : ${currentCatObj.nameFr}` : `Subject: ${currentCatObj.nameEn}`}
+                                    </h2>
+                                    <p className="text-xs text-slate-400">
+                                        {lang === 'ar' ? 'أدخل ملاحظاتك أو ارفع صورة الدرس للبدء' : lang === 'fr' ? 'Entrez vos notes ou joignez une image' : 'Enter notes or upload lesson image to start'}
+                                    </p>
+                                </div>
+                            </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-xs text-slate-400">
-                                    {lang === 'ar' ? 'لغة الشرح:' : lang === 'fr' ? 'Langue d\'explication :' : 'Explanation Language:'}
+                                    {lang === 'ar' ? 'لغة الشرح:' : lang === 'fr' ? 'Langue :' : 'Language:'}
                                 </span>
                                 <select 
                                     value={explLang} 
                                     onChange={(e) => setExplLang(e.target.value)}
                                     className="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded px-2 py-1 focus:outline-none focus:border-blue-500"
                                 >
-                                    <option value="auto">🔄 Auto (Match Lesson Language)</option>
+                                    <option value="auto">🔄 Auto (Match Lesson)</option>
                                     <option value="en">🇬🇧 English</option>
                                     <option value="fr">🇫🇷 Français</option>
                                     <option value="ar">🇸🇦 العربية</option>
@@ -234,7 +241,7 @@
 
                         <textarea 
                             rows="4"
-                            placeholder={lang === 'ar' ? 'اكتب ملاحظات الدرس هنا أو ضع النص باللغة (عربي، فرنسي، أو إنجليزي)...' : lang === 'fr' ? 'Collez votre cours ici (Français, Anglais, Arabe)...' : 'Type or paste lesson notes here (Supports EN, FR, AR)...'}
+                            placeholder={lang === 'ar' ? `اكتب مسألة أو ملاحظات لدرس ${currentCatObj.nameAr} هنا...` : lang === 'fr' ? `Tapez votre cours de ${currentCatObj.nameFr} ici...` : `Type your notes or questions for ${currentCatObj.nameEn} here...`}
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-slate-200 mb-4 focus:outline-none focus:border-blue-500 text-sm"
@@ -270,7 +277,7 @@
                                 <div className="flex items-center gap-3">
                                     <img src={attachedImage} alt="Preview" className="w-12 h-12 object-cover rounded border border-slate-700" />
                                     <span className="text-xs text-slate-300 font-medium">
-                                        {lang === 'ar' ? 'تم إرفاق الصورة' : lang === 'fr' ? 'Image jointe' : 'Image attached'}
+                                        {lang === 'ar' ? 'تم إرفاق الصورة بنجاح' : lang === 'fr' ? 'Image jointe avec succès' : 'Image attached successfully'}
                                     </span>
                                 </div>
                                 <button onClick={() => setAttachedImage(null)} className="text-xs text-red-400 hover:text-red-300 px-2 py-1">
@@ -283,9 +290,9 @@
                             <button 
                                 onClick={handleGeminiCall}
                                 disabled={loading}
-                                className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
+                                className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm shadow-md"
                             >
-                                {loading ? (lang === 'ar' ? 'جاري المعالجة...' : lang === 'fr' ? 'Traitement...' : 'Processing...') : (lang === 'ar' ? 'اشرح الدرس بالذكاء الاصطناعي' : lang === 'fr' ? 'Expliquer la leçon' : 'Explain Lesson with AI')}
+                                {loading ? (lang === 'ar' ? 'جاري تحليل الدرس...' : lang === 'fr' ? 'Analyse en cours...' : 'Analyzing Lesson...') : (lang === 'ar' ? 'اشرح الدرس بالذكاء الاصطناعي' : lang === 'fr' ? 'Expliquer la leçon' : 'Explain Lesson with AI')}
                             </button>
                         </div>
 
@@ -309,7 +316,7 @@
 
                     {/* Footer */}
                     <footer className="text-center text-xs text-slate-600 pt-4 border-t border-slate-900">
-                        StudyFlow Platform © 2026. A Product by Distingstyle Ltd. All rights reserved.
+                        StudyFlow Platform &copy; 2026. A Product by Distingstyle Ltd. All rights reserved.
                     </footer>
                 </div>
             );
