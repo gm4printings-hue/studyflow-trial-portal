@@ -139,58 +139,58 @@
                 setSelectedOptionId(null);
 
                 setTimeout(() => {
-                    generateDeepDetailedSolution(explLang, currentCatObj.nameEn, notes, attachedImage);
+                    generateThoroughSolution(explLang, currentCatObj.nameEn, notes, attachedImage);
                     setLoading(false);
                 }, 700);
             };
 
-            const generateDeepDetailedSolution = (languageChoice, subject, userNotes, hasImage) => {
-                const inputQuery = userNotes.trim() ? userNotes : "Exercice scanné / Problème soumis";
+            const generateThoroughSolution = (languageChoice, subject, userNotes, hasImage) => {
+                const queryText = userNotes.trim() ? userNotes : "Exercice scanné / Problème soumis";
 
                 if (languageChoice === 'French' || languageChoice === 'fr') {
                     let output = `📚 ${subject} - Résolution Détaillée et Approfondie\n\n`;
-                    output += `🔍 Énoncé Analysé :\n« ${inputQuery} »\n${hasImage ? '📂 [Image de l\'exercice analysée par OCR]' : ''}\n\n`;
-                    output += `📌 Phase 1 : Compréhension et Analyse des Données\n`;
-                    output += `- Extraction rigoureuse des hypothèses initiales et des grandeurs connues.\n`;
-                    output += `- Définition du domaine d'étude et des contraintes mathématiques ou physiques du problème.\n\n`;
-                    output += `⚙️ Phase 2 : Démarche Méthodologique et Formules\n`;
-                    output += `- Sélection des théorèmes fondamentaux et des lois applicables à la situation.\n`;
-                    output += `- Établissement de la relation algébrique reliant les données aux inconnues.\n\n`;
-                    output += `🧮 Phase 3 : Calculs et Étapes Intermédiaires\n`;
-                    output += `- Étape A : Substitution numérique ou simplification algébrique pas à pas.\n`;
-                    output += `- Étape B : Résolution de l'équation ou calcul intermédiaire avec vérification des unités.\n\n`;
-                    output += `🎯 Phase 4 : Conclusion et Résultat Final\n`;
-                    output += `- Le résultat est encadré, analysé et validé sur le plan scientifique.`;
+                    output += `🔍 Énoncé Analysé :\n« ${queryText} »\n${hasImage ? '📂 [Image de l\'exercice scannée et traitée avec succès]' : ''}\n\n`;
+                    output += `📌 Étape 1 : Analyse des Données et Hypothèses\n`;
+                    output += `- Extraction minutieuse des grandeurs connues, des constantes et des objectifs de l'exercice.\n`;
+                    output += `- Définition des conditions initiales et du domaine de validité mathématique/physique.\n\n`;
+                    output += `⚙️ Étape 2 : Cadre Théorique et Sélection des Formules\n`;
+                    output += `- Identification des théorèmes fondamentaux et des lois applicables à la situation étudiée.\n`;
+                    output += `- Établissement de la relation logique entre les données et l'inconnue recherchée.\n\n`;
+                    output += `🧮 Étape 3 : Développements Algébriques et Calculs\n`;
+                    output += `- Application numérique ou simplification littérale étape par étape.\n`;
+                    output += `- Vérification de l'homogénéité des unités et des résultats intermédiaires.\n\n`;
+                    output += `🎯 Étape 4 : Conclusion et Résultat Définitif\n`;
+                    output += `- Le résultat final est clairement mis en valeur, analysé et validé sur le plan scientifique.`;
                     setSummary(output);
                 } else if (languageChoice === 'Arabic' || languageChoice === 'ar') {
                     let output = `📚 ${subject} - الحل المفصل والشامل للتمرين\n\n`;
-                    output += `🔍 نص المسألة أو المعطيات :\n« ${inputQuery} »\n${hasImage ? '📂 [تم استقراء الصورة الضوئية وتحليلها]' : ''}\n\n`;
-                    output += `📌 المرحلة الأولى : دراسة المعطيات وتحديد المطلوب\n`;
-                    output += `- استخلاص المعطيات الرياضية أو العلمية بدقة متناهية.\n`;
-                    output += `- تحديد الهدف النهائي المراد إثباته أو حسابه.\n\n`;
-                    output += `⚙️ المرحلة الثانية : القوانين والنظريات المستخدمة\n`;
-                    output += `- استعراض القوانين الأساسية التي تخدم حل التمرين.\n`;
-                    output += `- ربط المعطيات بالمجهول عبر المعادلات الرياضية المناسبة.\n\n`;
-                    output += `🧮 المرحلة الثالثة : الخطوات الحسابية التفصيلية\n`;
-                    output += `- الخطوة أ : التعويض العددي المباشر أو المعالجة الجبرية.\n`;
-                    output += `- الخطوة ب : تبسيط المقادير واستخراج النتائج بدقة.\n\n`;
-                    output += `🎯 المرحلة الرابعة : النتيجة النهائية والتحقق\n`;
-                    output += `- كتابة الناتج النهائي بصورة واضحة وموثقة علمياً.`;
+                    output += `🔍 نص المسألة أو المعطيات :\n« ${queryText} »\n${hasImage ? '📂 [تم قراءة الصورة وتحليلها بدقة]' : ''}\n\n`;
+                    output += `📌 الخطوة 1 : استخراج المعطيات وتحديد المطلوب\n`;
+                    output += `- تفكيك نص المسألة إلى معلومات واضحة ومعطيات رقمية أو حرفية.\n`;
+                    output += `- تحديد الهدف النهائي المراد إثباته أو حسابه بدقة.\n\n`;
+                    output += `⚙️ الخطوة 2 : استعراض القوانين والنظريات الأساسية\n`;
+                    output += `- كتابة العلاقات الرياضية أو الفيزيائية المرتبطة بموضوع الدرس.\n`;
+                    output += `- تبرير اختيار كل قانون وشروط استخدامه.\n\n`;
+                    output += `🧮 الخطوة 3 : الخطوات الحسابية والمعالجة الجبرية\n`;
+                    output += `- التعويض العددي المباشر وتبسيط المقادير خطوة بخطوة.\n`;
+                    output += `- التأكد من صحة الحسابات والوحدات المستخدمة.\n\n`;
+                    output += `🎯 الخطوة 4 : النتيجة النهائية والتحقق\n`;
+                    output += `- صياغة الناتج النهائي في إطار واضح ومثبت علمياً.`;
                     setSummary(output);
                 } else {
                     let output = `📚 ${subject} - Comprehensive Detailed Solution\n\n`;
-                    output += `🔍 Problem Statement :\n« ${inputQuery} »\n${hasImage ? '📂 [Exercise image processed successfully]' : ''}\n\n`;
-                    output += `📌 Phase 1 : Data Analysis & Constraints\n`;
-                    output += `- Deep extraction of initial hypotheses, given values, and objectives.\n`;
-                    output += `- Establishing the mathematical or physical domain scope.\n\n`;
-                    output += `⚙️ Phase 2 : Theoretical Framework & Formulas\n`;
+                    output += `🔍 Problem Statement :\n« ${queryText} »\n${hasImage ? '📂 [Exercise image processed successfully via OCR]' : ''}\n\n`;
+                    output += `📌 Step 1 : Data Extraction & Constraints\n`;
+                    output += `- Deep extraction of initial hypotheses, parameters, and targets.\n`;
+                    output += `- Defining mathematical or physical domain boundaries.\n\n`;
+                    output += `⚙️ Step 2 : Theoretical Framework & Formulas\n`;
                     output += `- Selecting governing theorems and structural equations.\n`;
-                    output += `- Connecting knowns to unknowns through logical deduction.\n\n`;
-                    output += `🧮 Phase 3 : Step-by-Step Computational Workflow\n`;
-                    output += `- Step A : Algebraic reduction and variable isolation.\n`;
-                    output += `- Step B : Numerical computation and unit verification.\n\n`;
-                    output += `🎯 Phase 4 : Final Verification & Conclusion\n`;
-                    output += `- Fully verified final outcome presented with academic rigor.`;
+                    output += `- Establishing direct logical links between givens and unknowns.\n\n`;
+                    output += `🧮 Step 3 : Computational Workflow\n`;
+                    output += `- Step-by-step algebraic manipulation and numerical substitution.\n`;
+                    output += `- Rigorous verification of calculation steps and units.\n\n`;
+                    output += `🎯 Step 4 : Final Verification & Conclusion\n`;
+                    output += `- Fully verified final outcome presented with complete academic precision.`;
                     setSummary(output);
                 }
             };
@@ -201,17 +201,17 @@
 
                 if (explLang === 'French' || explLang === 'fr') {
                     if (optionId === 1) {
-                        setSummary(`🔍 ${subject} - 📋 Rappel Approfondi des Formules :\n\n- Définitions mathématiques et physiques requises.\n- Conditions de validité des théorèmes appliqués.\n- Relations trigonométriques ou algébriques associées au chapitre.`);
+                        setSummary(`🔍 ${subject} - 📋 Rappel Approfondi des Formules :\n\n- Théorèmes clés et définitions mathématiques/physiques incontournables.\n- Propriétés algébriques et relations vectorielles ou trigonométriques.\n- Conditions d'application et limites de validité des lois utilisées.`);
                     } else if (optionId === 2) {
-                        setSummary(`⚡ ${subject} - 🛠️ Étapes Détaillées des Calculs et Développements :\n\n- 1. Factorisation et mise sous forme canonique / dérivée.\n- 2. Résolution détaillée des inéquations ou systèmes d'équations.\n- 3. Analyse des variations ou des valeurs limites.`);
+                        setSummary(`⚡ ${subject} - 🛠️ Étapes Détaillées des Calculs et Développements :\n\n- Phase A : Transformation et simplification littérale de l'expression.\n- Phase B : Résolution numérique ou graphique détaillée.\n- Phase C : Discussion des solutions et interprétation physique ou géométrique.`);
                     } else {
-                        setSummary(`📝 ${subject} - 💡 Exercice d'Entraînement Pratique Similaire :\n\n- Énoncé type : Résolvez une application directe avec des valeurs modifiées.\n- Méthode conseillée : Suivre exactement la même démarche séquentielle.\n- Corrigé indicatif : Vérifiez votre autonomie d'apprentissage.`);
+                        setSummary(`📝 ${subject} - 💡 Exercice d'Entraînement Pratique Similaire :\n\n- Énoncé type : Traitez un cas d'application similaire avec des valeurs différentes.\n- Méthode conseillée : Suivez rigoureusement la même structure de raisonnement.\n- Auto-évaluation : Validez votre maîtrise du chapitre.`);
                     }
                 } else if (explLang === 'Arabic' || explLang === 'ar') {
                     if (optionId === 1) {
-                        setSummary(`🔍 ${subject} - 📋 مراجعة شاملة للقوانين :\n\n- سرد تفصيلي للنظريات والقواعد المستخدمة في التمرين.\n- توضيح متى وكيف يتم تطبيق كل قانون علمي.`);
+                        setSummary(`🔍 ${subject} - 📋 مراجعة معمقة للقوانين :\n\n- سرد تفصيلي للنظريات والقواعد المستخدمة في هذا النوع من المسائل.\n- شروط استخدام كل علاقة رياضية أو علمية.`);
                     } else if (optionId === 2) {
-                        setSummary(`⚡ ${subject} - 🛠️ تفاصيل خطوات الحساب والتحليل :\n\n- 1. المعالجة الجبرية والتبسيط الأقصى للعبارات.\n- 2. إيجاد الحلول الوسيطة والمناقشة حسب الشروط.\n- 3. كتابة النتيجة النهائية في إطار بارز.`);
+                        setSummary(`⚡ ${subject} - 🛠️ تفاصيل خطوات الحساب والتحليل :\n\n- 1. المعالجة الجبرية والتبسيط المتدرج للعبارات.\n- 2. إيجاد الحلول بدقة مع مناقشة الحالات الخاصة.\n- 3. كتابة النتيجة النهائية مع تحديد الوحدات.`);
                     } else {
                         setSummary(`📝 ${subject} - 💡 تمرين تدريبي إضافي مشابه :\n\n- تدرب بنفسك على مسألة تحاكي نفس الفكرة لترسيخ القدرات المهارية.`);
                     }
