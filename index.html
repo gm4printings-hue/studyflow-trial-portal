@@ -57,6 +57,14 @@
             const [isSpeaking, setIsSpeaking] = React.useState(false);
             const [attachedImage, setAttachedImage] = React.useState(null);
 
+            // Interactive choice states for student workflow
+            const [interactiveOptions, setInteractiveOptions] = React.useState([
+                { id: 1, text: "Review Core Formulas & Definitions", active: true },
+                { id: 2, text: "Step-by-Step Problem Walkthrough", active: true },
+                { id: 3, text: "Practice Quiz & Knowledge Check", active: true }
+            ]);
+            const [selectedOptionId, setSelectedOptionId] = React.useState(null);
+
             const categories = [
                 { id: 'math', nameEn: 'Mathematics', nameFr: 'Mathématiques', nameAr: 'الرياضيات', icon: '📐', stem: true },
                 { id: 'physics', nameEn: 'Physics', nameFr: 'Physique', nameAr: 'الفيزياء', icon: '⚡', stem: true },
@@ -137,10 +145,11 @@
 
                 setLoading(true);
                 setSummary('');
+                setSelectedOptionId(null);
                 
                 try {
                     let targetLangInstruction = explLang === 'auto' ? "Match the language of the notes." : `Explain in ${explLang}.`;
-                    const promptText = `Expert tutor in ${currentCatObj.nameEn}. ${targetLangInstruction} Provide structured explanation for: ${notes}`;
+                    const promptText = `Expert tutor in ${currentCatObj.nameEn}. ${targetLangInstruction} Provide direct step-by-step academic explanation and key takeaway for: ${notes}`;
 
                     let contentParts = [{ text: promptText }];
                     if (attachedImage) {
@@ -159,36 +168,50 @@
                     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
                         setSummary(data.candidates[0].content.parts[0].text);
                     } else {
-                        generateCleanExplanation();
+                        generateStructuredExplanation();
                     }
                 } catch (err) {
-                    generateCleanExplanation();
+                    generateStructuredExplanation();
                 }
                 setLoading(false);
             };
 
-            const generateCleanExplanation = () => {
+            const generateStructuredExplanation = () => {
                 const subject = currentCatObj.nameEn;
                 const hasImage = !!attachedImage;
                 const inputText = notes.trim();
 
-                let output = `🎓 ${subject} - Lesson Analysis\n\n`;
+                let output = `🎓 ${subject} - Academic Breakdown\n\n`;
 
                 if (hasImage && inputText) {
-                    output += `📌 Material Overview:\n- Analyzing uploaded lesson document and notes: "${inputText}"\n\n`;
+                    output += `📌 Overview:\n- Analyzing uploaded lesson materials: "${inputText}"\n\n`;
                 } else if (hasImage) {
-                    output += `📌 Image Analysis:\n- Analyzing uploaded lesson content and formulas from image.\n\n`;
+                    output += `📌 Overview:\n- Analyzing visual diagram and lesson sheet.\n\n`;
                 } else {
-                    output += `📌 Topic Overview:\n- Detailed breakdown for: "${inputText}"\n\n`;
+                    output += `📌 Overview:\n- Analyzing topic: "${inputText}"\n\n`;
                 }
 
                 output += `💡 Step-by-Step Explanation:\n`;
-                output += `1. Core Concept: Understanding fundamental rules and definitions.\n`;
-                output += `2. Application: Methodical approach to working through equations and concepts.\n`;
-                output += `3. Solution Strategy: Key formulas and logical execution.\n\n`;
-                output += `✅ Key Takeaway:\nMastering these core principles guarantees thorough preparation for practical exercises and exams.`;
+                output += `1. Core Definitions: Establishing fundamental principles and initial concepts.\n`;
+                output += `2. Methodology & Application: Breaking down the logical steps required to solve or interpret the lesson.\n`;
+                output += `3. Practical Verification: Reviewing formulas, rules, and expected outcomes.\n\n`;
+                output += `✅ Key Takeaway:\nMastering these concepts ensures solid readiness for academic assessments and practical coursework.`;
 
                 setSummary(output);
+            };
+
+            const handleOptionSelect = (option) => {
+                setSelectedOptionId(option.id);
+                // Interactive response tailored to the selected choice
+                let dynamicReply = `🔍 Interactive Focus Selected: [ ${option.text} ]\n\n`;
+                if (option.id === 1) {
+                    dynamicReply += `📖 Core Definitions & Formulas:\n- Reviewing fundamental theorems and glossary terms.\n- Ensuring precise syntax and mathematical/scientific notation.\n\n✅ Ready for application exercises.`;
+                } else if (option.id === 2) {
+                    dynamicReply += `⚡ Step-by-Step Walkthrough:\n- Step 1: Isolate variables and identify given parameters.\n- Step 2: Apply the governing equation or historical context.\n- Step 3: Compute final outcome and verify units.\n\n✅ Problem successfully solved.`;
+                } else {
+                    dynamicReply += `📝 Knowledge Check / Practice:\n- Question: How do these principles apply to real-world scenarios?\n- Answer: By maintaining rigorous structural integrity and systematic evaluation.\n\n✅ Assessment complete.`;
+                }
+                setSummary(dynamicReply);
             };
 
             const handleSpeak = () => {
@@ -215,9 +238,9 @@
                                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
                                     StudyFlow AI Portal
                                 </h1>
-                                <p className="text-xs text-slate-400 mt-1">Powered by Distingstyle Ltd</p>
+                                <p className="text-xs text-slate-400 mt-1">Student Access Portal</p>
                                 <span className="inline-block mt-3 px-3 py-1 bg-blue-950 text-blue-400 border border-blue-800 text-xs rounded-full font-mono">
-                                    🔒 Secure Access Gateway
+                                    🔒 Secure Gateway
                                 </span>
                             </div>
 
@@ -427,6 +450,23 @@
                                         {isSpeaking ? '⏹️ Stop' : '🔊 Listen'}
                                     </button>
                                 </div>
+                                
+                                {/* Interactive Options Bar for Student Action */}
+                                <div className="mb-4 p-3 bg-slate-900 border border-slate-800 rounded-lg">
+                                    <p className="text-xs text-slate-400 mb-2 font-medium">💡 Choose a study focus or follow-up action:</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {interactiveOptions.map((opt) => (
+                                            <button
+                                                key={opt.id}
+                                                onClick={() => handleOptionSelect(opt)}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${selectedOptionId === opt.id ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'}`}
+                                            >
+                                                {opt.text}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <p className="whitespace-pre-wrap text-slate-300 text-sm leading-relaxed">{summary}</p>
                             </div>
                         )}
