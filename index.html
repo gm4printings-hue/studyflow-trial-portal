@@ -50,7 +50,7 @@
             const [lang, setLang] = React.useState('en');
             const [explLang, setExplLang] = React.useState('auto');
 
-            // System Gemini API Key (Hidden from students)
+            // ⚠️ استبدل "YOUR_GEMINI_API_KEY_HERE" بمفتاح الـ API الحقيقي الخاص بك هنا:
             const systemApiKey = "YOUR_GEMINI_API_KEY_HERE";
 
             const [selectedCategory, setSelectedCategory] = React.useState('math');
@@ -133,6 +133,10 @@
             };
 
             const handleGeminiCall = async () => {
+                if (systemApiKey === "YOUR_GEMINI_API_KEY_HERE" || !systemApiKey) {
+                    alert('System Error: Please configure your Gemini API Key in the code.');
+                    return;
+                }
                 if (!notes.trim() && !attachedImage) {
                     alert('Please enter text or upload an image.');
                     return;
@@ -187,7 +191,7 @@
                 }
             };
 
-            // LOGIN / CREATE ACCOUNT GATE WITH SHOW/HIDE PASS & REMEMBER ME
+            // LOGIN / CREATE ACCOUNT GATE
             if (!currentUser) {
                 return (
                     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6">
@@ -403,7 +407,7 @@
 
                         {summary && (
                             <div className="mt-6 p-4 bg-slate-950 border border-slate-800 rounded-lg relative">
-                                <div className="flex بجانب justify-between items-center mb-3 border-b border-slate-800 pb-2">
+                                <div className="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
                                     <h3 className="font-semibold text-blue-400 text-sm">Explanation Result:</h3>
                                     <button onClick={handleSpeak} className="bg-indigo-900/60 hover:bg-indigo-800 border border-indigo-700/50 text-indigo-200 px-3 py-1 rounded text-xs">
                                         {isSpeaking ? '⏹️ Stop' : '🔊 Listen'}
