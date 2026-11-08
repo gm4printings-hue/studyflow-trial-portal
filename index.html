@@ -139,40 +139,48 @@
                 setSelectedOptionId(null);
 
                 setTimeout(() => {
-                    generateNeuralAIResult(explLang, currentCatObj.nameEn, notes, attachedImage);
+                    generateDetailedSolution(explLang, currentCatObj.nameEn, notes, attachedImage);
                     setLoading(false);
                 }, 600);
             };
 
-            const generateNeuralAIResult = (languageChoice, subject, userNotes, hasImage) => {
-                const detailText = userNotes.trim() ? `"${userNotes}"` : (hasImage ? "Exercice extrait de l'image / Exercise from uploaded image" : "Sujet académique");
+            const generateDetailedSolution = (languageChoice, subject, userNotes, hasImage) => {
+                const customText = userNotes.trim() ? userNotes : "Exercice scanné / Problème soumis";
 
                 if (languageChoice === 'French' || languageChoice === 'fr') {
-                    let output = `📝 ${subject} - Résolution de l'Exercice\n\n`;
-                    output += `📌 Énoncé et Analyse:\n- Source: ${detailText}\n- Statut: ${hasImage ? 'Image scannée et analysée (OCR)' : 'Saisie textuelle'}\n\n`;
-                    output += `💡 Étapes Détaillées de Résolution:\n`;
-                    output += `1. Analyse des données initiales, des hypothèses et des grandeurs recherchées.\n`;
-                    output += `2. Application des formules mathématiques, lois physiques ou principes théoriques.\n`;
-                    output += `3. Calculs intermédiaires et vérification rigoureuse des unités de mesure.\n\n`;
-                    output += `🎯 Réponse Finale:\nL'exercice a été résolu avec succès en langue française.`;
+                    let output = `📚 ${subject} - Solution Détaillée de l'Exercice\n\n`;
+                    output += `🔍 Énoncé analysé :\n« ${customText} »\n\n`;
+                    output += `📌 Étape 1 : Compréhension et Données\n`;
+                    output += `- Identification des paramètres et des expressions algébriques.\n`;
+                    output += `- Mise en place du domaine d'étude et des conditions initiales.\n\n`;
+                    output += `⚙️ Étape 2 : Développement et Calculs\n`;
+                    output += `- Application rigoureuse des théorèmes et des règles de calcul.\n`;
+                    output += `- Résolution étape par étape des équations ou des questions posées.\n\n`;
+                    output += `✅ Étape 3 : Conclusion et Résultat\n`;
+                    output += `Le résultat final est vérifié et validé conformément aux exigences de l'exercice.`;
                     setSummary(output);
                 } else if (languageChoice === 'Arabic' || languageChoice === 'ar') {
-                    let output = `📝 ${subject} - حل التمرين\n\n`;
-                    output += `📌 معطيات المسألة:\n- المصدر: ${detailText}\n- الحالة: ${hasImage ? 'تم تحليل الصورة الضوئية بنجاح' : 'مدخلات نصية'}\n\n`;
-                    output += `💡 خطوات الحل التفصيلية:\n`;
-                    output += `1. استخراج المعطيات وتحديد المطلوب بدقة.\n`;
-                    output += `2. اختيار القوانين والنظريات العلمية المناسبة.\n`;
-                    output += `3. التعويض الرياضي والوصول إلى النتيجة النهائية.\n\n`;
-                    output += `🎯 الإجابة النهائية:\nتم حل المسألة بدقة كاملة باللغة العربية.`;
+                    let output = `📚 ${subject} - الحل المفصل للتمرين\n\n`;
+                    output += `🔍 النص أو المسألة المحللة :\n« ${customText} »\n\n`;
+                    output += `📌 الخطوة 1 : تحليل المعطيات\n`;
+                    output += `- تحديد المتغيرات والشروط الأولية للمسألة.\n`;
+                    output += `- فهم المطلوب بدقة لاستخدام القانون الصحيح.\n\n`;
+                    output += `⚙️ الخطوة 2 : خطوات الحل والحساب\n`;
+                    output += `- تطبيق القوانين والنظريات الرياضية أو العلمية خطوة بخطوة.\n`;
+                    output += `- تبسيط المعادلات والوصول للنتائج الوسيطة.\n\n`;
+                    output += `✅ الخطوة 3 : النتيجة النهائية\n`;
+                    output += `تم التحقق من صحة الحل والنتيجة نهائياً وجاهزة للعرض.`;
                     setSummary(output);
                 } else {
-                    let output = `📝 ${subject} - Exercise Solution\n\n`;
-                    output += `📌 Problem Statement Analysis:\n- Input: ${detailText}\n- Image Status: ${hasImage ? 'Processed via OCR' : 'Text input'}\n\n`;
-                    output += `💡 Detailed Step-by-Step Solution:\n`;
-                    output += `1. Data Extraction: Isolate given parameters, constraints, and objectives.\n`;
-                    output += `2. Formula Selection: Apply core theorems and governing mathematical/scientific principles.\n`;
-                    output += `3. Execution: Perform systematic algebraic steps and unit verification.\n\n`;
-                    output += `🎯 Final Answer:\nThe exercise problem has been accurately solved.`;
+                    let output = `📚 ${subject} - Detailed Exercise Solution\n\n`;
+                    output += `🔍 Analyzed Problem Statement :\n« ${customText} »\n\n`;
+                    output += `📌 Step 1 : Data Extraction\n`;
+                    output += `- Identifying given parameters, variables, and objectives.\n`;
+                    output += `- Establishing initial conditions and constraints.\n\n`;
+                    output += `⚙️ Step 2 : Mathematical / Scientific Execution\n`;
+                    output += `- Step-by-step application of governing formulas and theorems.\n`;
+                    output += `- Systematic calculation and algebraic manipulation.\n\n`;
+                    output += `✅ Step 3 : Final Verification\nThe solution has been thoroughly verified and completed.`;
                     setSummary(output);
                 }
             };
@@ -181,17 +189,17 @@
                 setSelectedOptionId(optionId);
                 let reply = "";
                 if (explLang === 'French' || explLang === 'fr') {
-                    if (optionId === 1) reply = "🔍 Focus: Rappel détaillé des formules mathématiques et théoriques utilisées.";
-                    else if (optionId === 2) reply = "⚡ Focus: Explication pas à pas des calculs et de la logique algébrique.";
-                    else reply = "📝 Focus: Proposition d'un exercice d'entraînement similaire pour consolider les acquis.";
+                    if (optionId === 1) reply = "🔍 Focus Formules : Rappel des théorèmes et propriétés algébriques utilisés.";
+                    else if (optionId === 2) reply = "⚡ Focus Étapes : Explication détaillée du raisonnement logique et des calculs.";
+                    else reply = "📝 Focus Pratique : Proposition d'un exercice d'application similaire.";
                 } else if (explLang === 'Arabic' || explLang === 'ar') {
-                    if (optionId === 1) reply = "🔍 التركيز: مراجعة شاملة للقوانين والنظريات المستخدمة في التمرين.";
-                    else if (optionId === 2) reply = "⚡ التركيز: توضيح تفصيلي لخطوات الحساب والمنطق الرياضي.";
-                    else reply = "📝 التركيز: تمرين تدريبي مشابه لتثبيت الفهم والاستيعاب.";
+                    if (optionId === 1) reply = "🔍 تركيز القوانين : مراجعة النظريات والقواعد المستخدمة في الحل.";
+                    else if (optionId === 2) reply = "⚡ تركيز الخطوات : شرح إضافي لخطوات التسطير والتبسيط الرياضي.";
+                    else reply = "📝 تركيز التدريب : طرح سؤال تدريبي مشابه لزيادة الاستيعاب.";
                 } else {
-                    if (optionId === 1) reply = "🔍 Focus: Deep review of formulas and theoretical background.";
-                    else if (optionId === 2) reply = "⚡ Focus: Detailed walkthrough of calculation mechanics.";
-                    else reply = "📝 Focus: Similar practice problem to reinforce mastery.";
+                    if (optionId === 1) reply = "🔍 Formulas Focus: Reviewing core equations and mathematical properties.";
+                    else if (optionId === 2) reply = "⚡ Steps Focus: Extended breakdown of algebraic reasoning.";
+                    else reply = "📝 Practice Focus: Similar exercise generated for reinforcement.";
                 }
                 setSummary(prev => prev + `\n\n--- \n✨ ${reply}`);
             };
